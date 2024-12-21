@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:qa="http://some-company/schema/bpmn/qa" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:process id="eca_lib_0032" name="ECA and http services" isExecutable="true" camunda:versionTag="v1">
+    <bpmn2:documentation>This model has 2 parts:
+
+1. It demonstrates how to use API endpoints provided by the [http_client_manager](https://www.drupal.org/project/http_client_manager) module and accessing the data they receive from remote services.
+2. It then also demonstrates how to use ECA endpoints to controll the access to that endpoint and building up a response to it.
+
+In a follow up model, we will then show how the ECA endpoint can be made available to the HTTP Client Manager, so that one Drupal sites could be offering an API endpoint controlled by ECA, and another Drupal site then requested data from that API.
+
+The creation of this module was recorded and the video with additional explanations can be [watched here](https://tube.tchncs.de/w/eTrzr42LFCmpGv682rqrgz).</bpmn2:documentation>
+    <bpmn2:extensionElements>
+      <camunda:properties>
+        <camunda:property name="Changelog v1" value="Initial release."/>
+        <camunda:property name="Tags" value="simple,http,API,endpoint,access"/>
+      </camunda:properties>
+    </bpmn2:extensionElements>
+    <bpmn2:startEvent id="Event_1s3uc5u" name="Custom event" camunda:modelerTemplate="org.drupal.event.eca_base:eca_custom">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_base:eca_custom"/>
+        </camunda:properties>
+        <camunda:field name="event_id">
+          <camunda:string>http01</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_0z31vm2</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_0goldzj" name="Receive all posts" camunda:modelerTemplate="org.drupal.action.http_client_manager_preconfigured_request:all_posts">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="http_client_manager_preconfigured_request:all_posts"/>
+        </camunda:properties>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0z31vm2</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_04o6qb0</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0z31vm2" sourceRef="Event_1s3uc5u" targetRef="Activity_0goldzj"/>
+    <bpmn2:task id="Activity_0edcvqy" name="Store result in a token" camunda:modelerTemplate="org.drupal.action.eca_privatetempstore_read">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_privatetempstore_read"/>
+        </camunda:properties>
+        <camunda:field name="collection">
+          <camunda:string>http_client_manager</camunda:string>
+        </camunda:field>
+        <camunda:field name="key">
+          <camunda:string>last result</camunda:string>
+        </camunda:field>
+        <camunda:field name="token_name">
+          <camunda:string>result</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_04o6qb0</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0av152f</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_04o6qb0" sourceRef="Activity_0goldzj" targetRef="Activity_0edcvqy"/>
+    <bpmn2:task id="Activity_1c777zu" name="Print result" camunda:modelerTemplate="org.drupal.action.action_message_action">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="action_message_action"/>
+        </camunda:properties>
+        <camunda:field name="message">
+          <camunda:string>Result was:
+
+[result:0:title]</camunda:string>
+        </camunda:field>
+        <camunda:field name="replace_tokens">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0av152f</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0av152f" sourceRef="Activity_0edcvqy" targetRef="Activity_1c777zu"/>
+    <bpmn2:startEvent id="Event_0nbwyol" name="Define API access" camunda:modelerTemplate="org.drupal.event.eca_endpoint:access">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_endpoint:access"/>
+        </camunda:properties>
+        <camunda:field name="first_path_argument">
+          <camunda:string>tv</camunda:string>
+        </camunda:field>
+        <camunda:field name="second_path_argument">
+          <camunda:string>test1</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_0udtyn8</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_0em35dt" name="allow access" camunda:modelerTemplate="org.drupal.action.eca_access_set_result">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_access_set_result"/>
+        </camunda:properties>
+        <camunda:field name="access_result">
+          <camunda:string>allowed</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0udtyn8</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0udtyn8" sourceRef="Event_0nbwyol" targetRef="Activity_0em35dt"/>
+    <bpmn2:startEvent id="Event_0505h6i" name="Define API response" camunda:modelerTemplate="org.drupal.event.eca_endpoint:response">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_endpoint:response"/>
+        </camunda:properties>
+        <camunda:field name="first_path_argument">
+          <camunda:string>tv</camunda:string>
+        </camunda:field>
+        <camunda:field name="second_path_argument">
+          <camunda:string>test1</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_0bp7212</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_1w2b9qc" name="Define response content" camunda:modelerTemplate="org.drupal.action.eca_endpoint_set_response_content">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_endpoint_set_response_content"/>
+        </camunda:properties>
+        <camunda:field name="content">
+          <camunda:string>[
+{"name":"John Doe"},
+{"name":"Jürgen Haas","location":"Germany"}
+]</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0bp7212</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_10n5gup</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0bp7212" sourceRef="Event_0505h6i" targetRef="Activity_1w2b9qc"/>
+    <bpmn2:task id="Activity_1vwcl5y" name="Set response code" camunda:modelerTemplate="org.drupal.action.eca_endpoint_set_response_status_code">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_endpoint_set_response_status_code"/>
+        </camunda:properties>
+        <camunda:field name="code">
+          <camunda:string>201</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_10n5gup</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1lvwkuu</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_10n5gup" sourceRef="Activity_1w2b9qc" targetRef="Activity_1vwcl5y"/>
+    <bpmn2:task id="Activity_0echpli" name="Set json content type" camunda:modelerTemplate="org.drupal.action.eca_endpoint_set_response_content_type">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_endpoint_set_response_content_type"/>
+        </camunda:properties>
+        <camunda:field name="content_type">
+          <camunda:string>application/json; charset=UTF-8</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1lvwkuu</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1lvwkuu" sourceRef="Activity_1vwcl5y" targetRef="Activity_0echpli"/>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="sid-a4599e79-d74f-4ebe-b2bf-a455aa57add6">
+    <bpmndi:BPMNPlane id="sid-f423eab8-48ae-42e4-b70f-4a9fca6946ef" bpmnElement="eca_lib_0032">
+      <bpmndi:BPMNShape id="Event_1s3uc5u_di" bpmnElement="Event_1s3uc5u">
+        <dc:Bounds x="452" y="92" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="436" y="135" width="68" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0goldzj_di" bpmnElement="Activity_0goldzj">
+        <dc:Bounds x="540" y="70" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0edcvqy_di" bpmnElement="Activity_0edcvqy">
+        <dc:Bounds x="700" y="70" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1c777zu_di" bpmnElement="Activity_1c777zu">
+        <dc:Bounds x="860" y="70" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0nbwyol_di" bpmnElement="Event_0nbwyol">
+        <dc:Bounds x="452" y="182" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="426" y="225" width="90" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0em35dt_di" bpmnElement="Activity_0em35dt">
+        <dc:Bounds x="540" y="160" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0505h6i_di" bpmnElement="Event_0505h6i">
+        <dc:Bounds x="452" y="272" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="444" y="315" width="53" height="27"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1w2b9qc_di" bpmnElement="Activity_1w2b9qc">
+        <dc:Bounds x="540" y="250" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1vwcl5y_di" bpmnElement="Activity_1vwcl5y">
+        <dc:Bounds x="700" y="250" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0echpli_di" bpmnElement="Activity_0echpli">
+        <dc:Bounds x="860" y="250" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0z31vm2_di" bpmnElement="Flow_0z31vm2">
+        <di:waypoint x="488" y="110"/>
+        <di:waypoint x="540" y="110"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_04o6qb0_di" bpmnElement="Flow_04o6qb0">
+        <di:waypoint x="640" y="110"/>
+        <di:waypoint x="700" y="110"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0av152f_di" bpmnElement="Flow_0av152f">
+        <di:waypoint x="800" y="110"/>
+        <di:waypoint x="860" y="110"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0udtyn8_di" bpmnElement="Flow_0udtyn8">
+        <di:waypoint x="488" y="200"/>
+        <di:waypoint x="540" y="200"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0bp7212_di" bpmnElement="Flow_0bp7212">
+        <di:waypoint x="488" y="290"/>
+        <di:waypoint x="540" y="290"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10n5gup_di" bpmnElement="Flow_10n5gup">
+        <di:waypoint x="640" y="290"/>
+        <di:waypoint x="700" y="290"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1lvwkuu_di" bpmnElement="Flow_1lvwkuu">
+        <di:waypoint x="800" y="290"/>
+        <di:waypoint x="860" y="290"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

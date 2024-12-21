@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:qa="http://some-company/schema/bpmn/qa" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:process id="eca_lib_0012" name="Count user logins" isExecutable="true" camunda:versionTag="v1">
+    <bpmn2:documentation>This model adds a number field to the user entity with a default value 0. It then increments that value, each time that user logs into the site.</bpmn2:documentation>
+    <bpmn2:extensionElements>
+      <camunda:properties>
+        <camunda:property name="Changelog v1" value="Initial version"/>
+        <camunda:property name="Tags" value="simple,update entity field"/>
+      </camunda:properties>
+    </bpmn2:extensionElements>
+    <bpmn2:startEvent id="Event_021ntxo" name="User login" camunda:modelerTemplate="org.drupal.event.user:login">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="user:login"/>
+        </camunda:properties>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_0wqsxqz</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_09fy9sj" name="Read value from user" camunda:modelerTemplate="org.drupal.action.eca_get_field_value">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_get_field_value"/>
+        </camunda:properties>
+        <camunda:field name="field_name">
+          <camunda:string>field_number_of_logins</camunda:string>
+        </camunda:field>
+        <camunda:field name="token_name">
+          <camunda:string>count</camunda:string>
+        </camunda:field>
+        <camunda:field name="object">
+          <camunda:string/>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0wqsxqz</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0uf62l8</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:task id="Activity_14q5xnt" name="Increment value" camunda:modelerTemplate="org.drupal.action.eca_tamper:math">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_tamper:math"/>
+        </camunda:properties>
+        <camunda:field name="eca_data">
+          <camunda:string>[count]</camunda:string>
+        </camunda:field>
+        <camunda:field name="eca_token_name">
+          <camunda:string>count</camunda:string>
+        </camunda:field>
+        <camunda:field name="operation">
+          <camunda:string>addition</camunda:string>
+        </camunda:field>
+        <camunda:field name="flip">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="value">
+          <camunda:string>1</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0uf62l8</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1eukjvg</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0uf62l8" sourceRef="Activity_09fy9sj" targetRef="Activity_14q5xnt"/>
+    <bpmn2:task id="Activity_0xg2fnq" name="Write value back to the user entity" camunda:modelerTemplate="org.drupal.action.eca_set_field_value">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_set_field_value"/>
+        </camunda:properties>
+        <camunda:field name="method">
+          <camunda:string>set:clear</camunda:string>
+        </camunda:field>
+        <camunda:field name="strip_tags">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="trim">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="field_name">
+          <camunda:string>field_number_of_logins</camunda:string>
+        </camunda:field>
+        <camunda:field name="save_entity">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+        <camunda:field name="field_value">
+          <camunda:string>[count]</camunda:string>
+        </camunda:field>
+        <camunda:field name="object">
+          <camunda:string/>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1eukjvg</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1eukjvg" sourceRef="Activity_14q5xnt" targetRef="Activity_0xg2fnq"/>
+    <bpmn2:sequenceFlow id="Flow_0wqsxqz" sourceRef="Event_021ntxo" targetRef="Activity_09fy9sj"/>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="sid-b401f843-9983-4628-9da5-03764ba2065c">
+    <bpmndi:BPMNPlane id="sid-519a02a5-1c62-4be1-ace8-f1a49400dfdc" bpmnElement="eca_lib_0012">
+      <bpmndi:BPMNShape id="Event_021ntxo_di" bpmnElement="Event_021ntxo">
+        <dc:Bounds x="442" y="192" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="435" y="168" width="50" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_09fy9sj_di" bpmnElement="Activity_09fy9sj">
+        <dc:Bounds x="530" y="170" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_14q5xnt_di" bpmnElement="Activity_14q5xnt">
+        <dc:Bounds x="690" y="170" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0xg2fnq_di" bpmnElement="Activity_0xg2fnq">
+        <dc:Bounds x="850" y="170" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0uf62l8_di" bpmnElement="Flow_0uf62l8">
+        <di:waypoint x="630" y="210"/>
+        <di:waypoint x="690" y="210"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1eukjvg_di" bpmnElement="Flow_1eukjvg">
+        <di:waypoint x="790" y="210"/>
+        <di:waypoint x="850" y="210"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0wqsxqz_di" bpmnElement="Flow_0wqsxqz">
+        <di:waypoint x="478" y="210"/>
+        <di:waypoint x="530" y="210"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

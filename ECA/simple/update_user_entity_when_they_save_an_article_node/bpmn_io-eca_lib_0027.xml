@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:qa="http://some-company/schema/bpmn/qa" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:process id="eca_lib_0027" name="Update user entity when they save an article node" isExecutable="true" camunda:versionTag="v1">
+    <bpmn2:documentation>This model appends a comment to the author of a node when they create a new one or update an existing one.
+
+The creation of this module was recorded and the video with additional explanations can be [watched here](https://tube.tchncs.de/w/7jPP8ZXuhahq5K87L2cSrn).</bpmn2:documentation>
+    <bpmn2:extensionElements>
+      <camunda:properties>
+        <camunda:property name="Changelog v1" value="Initial version"/>
+        <camunda:property name="Tags" value="simple,entity reference,update entity field"/>
+      </camunda:properties>
+    </bpmn2:extensionElements>
+    <bpmn2:task id="Activity_1rperng" name="Load authors user entity" camunda:modelerTemplate="org.drupal.action.eca_token_load_entity">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_token_load_entity"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>author</camunda:string>
+        </camunda:field>
+        <camunda:field name="from">
+          <camunda:string>id</camunda:string>
+        </camunda:field>
+        <camunda:field name="entity_type">
+          <camunda:string>user</camunda:string>
+        </camunda:field>
+        <camunda:field name="entity_id">
+          <camunda:string>[node:author:uid]</camunda:string>
+        </camunda:field>
+        <camunda:field name="revision_id">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="langcode">
+          <camunda:string>_interface</camunda:string>
+        </camunda:field>
+        <camunda:field name="latest_revision">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="unchanged">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="properties">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="object">
+          <camunda:string/>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1izhoi3</bpmn2:incoming>
+      <bpmn2:incoming>Flow_1f3hpxv</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_02thxwn</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:task id="Activity_1ulb6ci" name="Set author comment in the user entity" camunda:modelerTemplate="org.drupal.action.eca_set_field_value">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_set_field_value"/>
+        </camunda:properties>
+        <camunda:field name="method">
+          <camunda:string>set:clear</camunda:string>
+        </camunda:field>
+        <camunda:field name="strip_tags">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="trim">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="field_name">
+          <camunda:string>field_author_comments</camunda:string>
+        </camunda:field>
+        <camunda:field name="save_entity">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+        <camunda:field name="field_value">
+          <camunda:string>[author:field_author_comments:value]
+
+---
+
+[current-date:long]: Edited article [node:nid] / [node:title]
+</camunda:string>
+        </camunda:field>
+        <camunda:field name="object">
+          <camunda:string>author</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_02thxwn</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_02thxwn" sourceRef="Activity_1rperng" targetRef="Activity_1ulb6ci"/>
+    <bpmn2:startEvent id="Event_0r4oiqk" name="Insert node" camunda:modelerTemplate="org.drupal.event.content_entity:insert">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="content_entity:insert"/>
+        </camunda:properties>
+        <camunda:field name="type">
+          <camunda:string>node _all</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_1izhoi3</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:sequenceFlow id="Flow_1izhoi3" sourceRef="Event_0r4oiqk" targetRef="Activity_1rperng"/>
+    <bpmn2:startEvent id="Event_0f7x7jb" name="Update node" camunda:modelerTemplate="org.drupal.event.content_entity:update">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="content_entity:update"/>
+        </camunda:properties>
+        <camunda:field name="type">
+          <camunda:string>node _all</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_1f3hpxv</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:sequenceFlow id="Flow_1f3hpxv" sourceRef="Event_0f7x7jb" targetRef="Activity_1rperng"/>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="sid-3091971e-ae24-4f3d-abc6-dd4fb78466d5">
+    <bpmndi:BPMNPlane id="sid-bdd2e4cd-142c-4777-93a4-25c007e9733d" bpmnElement="eca_lib_0027">
+      <bpmndi:BPMNShape id="Activity_1rperng_di" bpmnElement="Activity_1rperng">
+        <dc:Bounds x="460" y="140" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1ulb6ci_di" bpmnElement="Activity_1ulb6ci">
+        <dc:Bounds x="620" y="140" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0r4oiqk_di" bpmnElement="Event_0r4oiqk">
+        <dc:Bounds x="302" y="162" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="292" y="205" width="56" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0f7x7jb_di" bpmnElement="Event_0f7x7jb">
+        <dc:Bounds x="302" y="262" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="289" y="305" width="63" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_02thxwn_di" bpmnElement="Flow_02thxwn">
+        <di:waypoint x="560" y="180"/>
+        <di:waypoint x="620" y="180"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1izhoi3_di" bpmnElement="Flow_1izhoi3">
+        <di:waypoint x="338" y="180"/>
+        <di:waypoint x="460" y="180"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1f3hpxv_di" bpmnElement="Flow_1f3hpxv">
+        <di:waypoint x="338" y="280"/>
+        <di:waypoint x="399" y="280"/>
+        <di:waypoint x="399" y="180"/>
+        <di:waypoint x="460" y="180"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:qa="http://some-company/schema/bpmn/qa" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:process id="eca_lib_0006" name="Multi value field loop" isExecutable="true" camunda:versionTag="v1">
+    <bpmn2:documentation>This model demonstrates how to loop over all values of a multi value field without using custom events.</bpmn2:documentation>
+    <bpmn2:extensionElements>
+      <camunda:properties>
+        <camunda:property name="Tags" value="use case, loop, multi value field"/>
+        <camunda:property name="Changelog v1" value="Initial version"/>
+      </camunda:properties>
+    </bpmn2:extensionElements>
+    <bpmn2:startEvent id="Event_0eu5vdw" name="After user login" camunda:modelerTemplate="org.drupal.event.user:login">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="user:login"/>
+        </camunda:properties>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_04gsm59</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_1n8j475" name="Put list of user networks into a token" camunda:modelerTemplate="org.drupal.action.eca_token_set_value">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_token_set_value"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>network-list</camunda:string>
+        </camunda:field>
+        <camunda:field name="token_value">
+          <camunda:string>[user:field_user_networks]</camunda:string>
+        </camunda:field>
+        <camunda:field name="use_yaml">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_04gsm59</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1g8rn3k</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_04gsm59" sourceRef="Event_0eu5vdw" targetRef="Activity_1n8j475"/>
+    <bpmn2:exclusiveGateway id="Gateway_1f8yk8c">
+      <bpmn2:incoming>Flow_1g8rn3k</bpmn2:incoming>
+      <bpmn2:incoming>Flow_02lr1rm</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_170trfx</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:sequenceFlow id="Flow_1g8rn3k" sourceRef="Activity_1n8j475" targetRef="Gateway_1f8yk8c"/>
+    <bpmn2:task id="Activity_17wdear" name="Pop an item from the list" camunda:modelerTemplate="org.drupal.action.eca_list_remove">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_list_remove"/>
+        </camunda:properties>
+        <camunda:field name="list_token">
+          <camunda:string>network-list</camunda:string>
+        </camunda:field>
+        <camunda:field name="method">
+          <camunda:string>first</camunda:string>
+        </camunda:field>
+        <camunda:field name="index">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="value">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="token_name">
+          <camunda:string>item</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_170trfx</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_126qji0</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_170trfx" name="items&gt;0" camunda:modelerTemplate="org.drupal.condition.eca_count" sourceRef="Gateway_1f8yk8c" targetRef="Activity_17wdear">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_count"/>
+        </camunda:properties>
+        <camunda:field name="left">
+          <camunda:string>network-list</camunda:string>
+        </camunda:field>
+        <camunda:field name="operator">
+          <camunda:string>greaterthan</camunda:string>
+        </camunda:field>
+        <camunda:field name="right">
+          <camunda:string>0</camunda:string>
+        </camunda:field>
+        <camunda:field name="type">
+          <camunda:string>numeric</camunda:string>
+        </camunda:field>
+        <camunda:field name="case">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:task id="Activity_18r8m2h" name="Print message" camunda:modelerTemplate="org.drupal.action.action_message_action">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="action_message_action"/>
+        </camunda:properties>
+        <camunda:field name="message">
+          <camunda:string>You are member of &lt;strong&gt;[network:name]&lt;/strong&gt;</camunda:string>
+        </camunda:field>
+        <camunda:field name="replace_tokens">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0kdob93</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_02lr1rm</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_126qji0" sourceRef="Activity_17wdear" targetRef="Activity_0l7s5ld"/>
+    <bpmn2:sequenceFlow id="Flow_02lr1rm" sourceRef="Activity_18r8m2h" targetRef="Gateway_1f8yk8c"/>
+    <bpmn2:task id="Activity_0l7s5ld" name="Load term" camunda:modelerTemplate="org.drupal.action.eca_token_load_entity">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_token_load_entity"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>network</camunda:string>
+        </camunda:field>
+        <camunda:field name="from">
+          <camunda:string>id</camunda:string>
+        </camunda:field>
+        <camunda:field name="entity_type">
+          <camunda:string>taxonomy_term</camunda:string>
+        </camunda:field>
+        <camunda:field name="entity_id">
+          <camunda:string>[item:target_id]</camunda:string>
+        </camunda:field>
+        <camunda:field name="revision_id">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="langcode">
+          <camunda:string>_interface</camunda:string>
+        </camunda:field>
+        <camunda:field name="latest_revision">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="unchanged">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="properties">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="object">
+          <camunda:string/>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_126qji0</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0kdob93</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0kdob93" sourceRef="Activity_0l7s5ld" targetRef="Activity_18r8m2h"/>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="sid-6b95d527-99a6-4425-ba47-774baf58d2eb">
+    <bpmndi:BPMNPlane id="sid-253e748b-f133-4280-95a0-d6358c588f20" bpmnElement="eca_lib_0006">
+      <bpmndi:BPMNShape id="Event_0eu5vdw_di" bpmnElement="Event_0eu5vdw">
+        <dc:Bounds x="352" y="172" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="333" y="215" width="74" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1n8j475_di" bpmnElement="Activity_1n8j475">
+        <dc:Bounds x="440" y="150" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1f8yk8c_di" bpmnElement="Gateway_1f8yk8c" isMarkerVisible="true">
+        <dc:Bounds x="595" y="165" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_17wdear_di" bpmnElement="Activity_17wdear">
+        <dc:Bounds x="700" y="150" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_18r8m2h_di" bpmnElement="Activity_18r8m2h">
+        <dc:Bounds x="1020" y="150" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0l7s5ld_di" bpmnElement="Activity_0l7s5ld">
+        <dc:Bounds x="860" y="150" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_04gsm59_di" bpmnElement="Flow_04gsm59">
+        <di:waypoint x="388" y="190"/>
+        <di:waypoint x="440" y="190"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1g8rn3k_di" bpmnElement="Flow_1g8rn3k">
+        <di:waypoint x="540" y="190"/>
+        <di:waypoint x="595" y="190"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_170trfx_di" bpmnElement="Flow_170trfx">
+        <di:waypoint x="645" y="190"/>
+        <di:waypoint x="700" y="190"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="653" y="172" width="39" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_126qji0_di" bpmnElement="Flow_126qji0">
+        <di:waypoint x="800" y="190"/>
+        <di:waypoint x="860" y="190"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_02lr1rm_di" bpmnElement="Flow_02lr1rm">
+        <di:waypoint x="1070" y="230"/>
+        <di:waypoint x="1070" y="280"/>
+        <di:waypoint x="620" y="280"/>
+        <di:waypoint x="620" y="215"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0kdob93_di" bpmnElement="Flow_0kdob93">
+        <di:waypoint x="960" y="190"/>
+        <di:waypoint x="1020" y="190"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

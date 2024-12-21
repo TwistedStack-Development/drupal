@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:qa="http://some-company/schema/bpmn/qa" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:process id="eca_lib_0023" name="Scheduled publishing" isExecutable="true" camunda:versionTag="v1">
+    <bpmn2:documentation>This model demonstrates how to automatically publish and unpublish nodes by scheduled dates and times.
+
+The creation of this module was recorded and the video with additional explanations [can be watch here](https://tube.tchncs.de/w/5cs5Du3579Nwau1m9Rv92G).</bpmn2:documentation>
+    <bpmn2:extensionElements>
+      <camunda:properties>
+        <camunda:property name="Changelog v1" value="Initial release"/>
+        <camunda:property name="Tags" value="simple,cron,views,schedule"/>
+      </camunda:properties>
+    </bpmn2:extensionElements>
+    <bpmn2:startEvent id="Event_0p32014" name="Run cron" camunda:modelerTemplate="org.drupal.event.eca_base:eca_cron">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_base:eca_cron"/>
+        </camunda:properties>
+        <camunda:field name="frequency">
+          <camunda:string>* * * * *</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_1mrmkmk</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_0ithjix" name="Switch user" camunda:modelerTemplate="org.drupal.action.eca_switch_account">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_switch_account"/>
+        </camunda:properties>
+        <camunda:field name="user_id">
+          <camunda:string>1</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1mrmkmk</bpmn2:incoming>
+      <bpmn2:incoming>Flow_0w351aa</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1wuyij9</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_1lpi1ar</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1mrmkmk" sourceRef="Event_0p32014" targetRef="Activity_0ithjix"/>
+    <bpmn2:task id="Activity_15gpxb3" name="View: get due nodes for publishing" camunda:modelerTemplate="org.drupal.action.eca_views_query">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_views_query"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>listofnodes</camunda:string>
+        </camunda:field>
+        <camunda:field name="view_id">
+          <camunda:string>due_nodes_for_publishing</camunda:string>
+        </camunda:field>
+        <camunda:field name="display_id">
+          <camunda:string>publish</camunda:string>
+        </camunda:field>
+        <camunda:field name="arguments">
+          <camunda:string/>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1wuyij9</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_03y60cv</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1wuyij9" sourceRef="Activity_0ithjix" targetRef="Activity_15gpxb3"/>
+    <bpmn2:task id="Activity_0awq7h0" name="Trigger publish event" camunda:modelerTemplate="org.drupal.action.eca_trigger_content_entity_custom_event">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_trigger_content_entity_custom_event"/>
+        </camunda:properties>
+        <camunda:field name="event_id">
+          <camunda:string>publish</camunda:string>
+        </camunda:field>
+        <camunda:field name="tokens">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="object">
+          <camunda:string>listofnodes</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_03y60cv</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_03y60cv" sourceRef="Activity_15gpxb3" targetRef="Activity_0awq7h0"/>
+    <bpmn2:startEvent id="Event_09coysx" name="Publish event" camunda:modelerTemplate="org.drupal.event.content_entity:custom">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="content_entity:custom"/>
+        </camunda:properties>
+        <camunda:field name="event_id">
+          <camunda:string>publish</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_1bdjh0j</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_1ktdv93" name="Publish node" camunda:modelerTemplate="org.drupal.action.entity:publish_action:node">
+      <bpmn2:extensionElements>
+        <camunda:field name="object">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="entity:publish_action:node"/>
+        </camunda:properties>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1bdjh0j</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0iieckr</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1bdjh0j" sourceRef="Event_09coysx" targetRef="Activity_1ktdv93"/>
+    <bpmn2:task id="Activity_1k4co86" name="Message" camunda:modelerTemplate="org.drupal.action.action_message_action">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="action_message_action"/>
+        </camunda:properties>
+        <camunda:field name="message">
+          <camunda:string>Node [entity:nid] was published automatically.</camunda:string>
+        </camunda:field>
+        <camunda:field name="replace_tokens">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0iieckr</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0iieckr" sourceRef="Activity_1ktdv93" targetRef="Activity_1k4co86"/>
+    <bpmn2:task id="Activity_00vgm9i" name="View: get due nodes for unpublishing" camunda:modelerTemplate="org.drupal.action.eca_views_query">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_views_query"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>listofnodes</camunda:string>
+        </camunda:field>
+        <camunda:field name="view_id">
+          <camunda:string>due_nodes_for_publishing</camunda:string>
+        </camunda:field>
+        <camunda:field name="display_id">
+          <camunda:string>unpublish</camunda:string>
+        </camunda:field>
+        <camunda:field name="arguments">
+          <camunda:string/>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1lpi1ar</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0m9ft93</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1lpi1ar" sourceRef="Activity_0ithjix" targetRef="Activity_00vgm9i"/>
+    <bpmn2:task id="Activity_1bdbgcd" name="Trigger unpublish event" camunda:modelerTemplate="org.drupal.action.eca_trigger_content_entity_custom_event">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_trigger_content_entity_custom_event"/>
+        </camunda:properties>
+        <camunda:field name="event_id">
+          <camunda:string>unpublish</camunda:string>
+        </camunda:field>
+        <camunda:field name="tokens">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="object">
+          <camunda:string>listofnodes</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0m9ft93</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0m9ft93" sourceRef="Activity_00vgm9i" targetRef="Activity_1bdbgcd"/>
+    <bpmn2:startEvent id="Event_0riefxz" name="Unpublish event" camunda:modelerTemplate="org.drupal.event.content_entity:custom">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="content_entity:custom"/>
+        </camunda:properties>
+        <camunda:field name="event_id">
+          <camunda:string>unpublish</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_1rfx1y3</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_1wq2xku" name="Unpublish node" camunda:modelerTemplate="org.drupal.action.entity:unpublish_action:node">
+      <bpmn2:extensionElements>
+        <camunda:field name="object">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="entity:unpublish_action:node"/>
+        </camunda:properties>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1rfx1y3</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_02faand</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1rfx1y3" sourceRef="Event_0riefxz" targetRef="Activity_1wq2xku"/>
+    <bpmn2:task id="Activity_1ggf0t7" name="Message" camunda:modelerTemplate="org.drupal.action.action_message_action">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="action_message_action"/>
+        </camunda:properties>
+        <camunda:field name="message">
+          <camunda:string>Node [entity:nid] just got unpublished.</camunda:string>
+        </camunda:field>
+        <camunda:field name="replace_tokens">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_02faand</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_02faand" sourceRef="Activity_1wq2xku" targetRef="Activity_1ggf0t7"/>
+    <bpmn2:startEvent id="Event_18mnri3" name="Scheduled Publishing" camunda:modelerTemplate="org.drupal.event.eca_base:eca_custom">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_base:eca_custom"/>
+        </camunda:properties>
+        <camunda:field name="event_id">
+          <camunda:string>auto-publish</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_0w351aa</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:sequenceFlow id="Flow_0w351aa" sourceRef="Event_18mnri3" targetRef="Activity_0ithjix"/>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="sid-7f2c65fd-800e-4632-9f5d-48caed2d4ec9">
+    <bpmndi:BPMNPlane id="sid-75c0687e-a29e-4f60-b97b-28108d6cf98a" bpmnElement="eca_lib_0023">
+      <bpmndi:BPMNShape id="Event_0p32014_di" bpmnElement="Event_0p32014">
+        <dc:Bounds x="342" y="102" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="338" y="145" width="45" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ithjix_di" bpmnElement="Activity_0ithjix">
+        <dc:Bounds x="430" y="80" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_15gpxb3_di" bpmnElement="Activity_15gpxb3">
+        <dc:Bounds x="590" y="80" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0awq7h0_di" bpmnElement="Activity_0awq7h0">
+        <dc:Bounds x="750" y="80" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_09coysx_di" bpmnElement="Event_09coysx">
+        <dc:Bounds x="342" y="452" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="327" y="495" width="67" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1ktdv93_di" bpmnElement="Activity_1ktdv93">
+        <dc:Bounds x="430" y="430" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1k4co86_di" bpmnElement="Activity_1k4co86">
+        <dc:Bounds x="590" y="430" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_00vgm9i_di" bpmnElement="Activity_00vgm9i">
+        <dc:Bounds x="590" y="190" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1bdbgcd_di" bpmnElement="Activity_1bdbgcd">
+        <dc:Bounds x="750" y="190" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0riefxz_di" bpmnElement="Event_0riefxz">
+        <dc:Bounds x="342" y="542" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="321" y="585" width="79" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1wq2xku_di" bpmnElement="Activity_1wq2xku">
+        <dc:Bounds x="430" y="520" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1ggf0t7_di" bpmnElement="Activity_1ggf0t7">
+        <dc:Bounds x="590" y="520" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_18mnri3_di" bpmnElement="Event_18mnri3">
+        <dc:Bounds x="342" y="2" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="335" y="45" width="52" height="27"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1mrmkmk_di" bpmnElement="Flow_1mrmkmk">
+        <di:waypoint x="378" y="120"/>
+        <di:waypoint x="430" y="120"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1wuyij9_di" bpmnElement="Flow_1wuyij9">
+        <di:waypoint x="530" y="120"/>
+        <di:waypoint x="590" y="120"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_03y60cv_di" bpmnElement="Flow_03y60cv">
+        <di:waypoint x="690" y="120"/>
+        <di:waypoint x="750" y="120"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1bdjh0j_di" bpmnElement="Flow_1bdjh0j">
+        <di:waypoint x="378" y="470"/>
+        <di:waypoint x="430" y="470"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0iieckr_di" bpmnElement="Flow_0iieckr">
+        <di:waypoint x="530" y="470"/>
+        <di:waypoint x="590" y="470"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1lpi1ar_di" bpmnElement="Flow_1lpi1ar">
+        <di:waypoint x="530" y="120"/>
+        <di:waypoint x="560" y="120"/>
+        <di:waypoint x="560" y="230"/>
+        <di:waypoint x="590" y="230"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0m9ft93_di" bpmnElement="Flow_0m9ft93">
+        <di:waypoint x="690" y="230"/>
+        <di:waypoint x="750" y="230"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1rfx1y3_di" bpmnElement="Flow_1rfx1y3">
+        <di:waypoint x="378" y="560"/>
+        <di:waypoint x="430" y="560"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_02faand_di" bpmnElement="Flow_02faand">
+        <di:waypoint x="530" y="560"/>
+        <di:waypoint x="590" y="560"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0w351aa_di" bpmnElement="Flow_0w351aa">
+        <di:waypoint x="378" y="20"/>
+        <di:waypoint x="480" y="20"/>
+        <di:waypoint x="480" y="80"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

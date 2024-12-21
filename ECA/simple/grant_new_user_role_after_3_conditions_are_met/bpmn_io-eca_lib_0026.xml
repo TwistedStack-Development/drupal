@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:qa="http://some-company/schema/bpmn/qa" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:process id="eca_lib_0026" name="Grant new user role after 3 conditions are met" isExecutable="true" camunda:versionTag="v2">
+    <bpmn2:documentation>This model automatically adds or removes a role from a user, when this gets updated, depending upon 3 conditions that are stored with the user entity. Only if all 3 conditions are met, the role gets added. In all other cases the role gets removed.
+
+The creation of this module was recorded and the video with additional explanations can be [watched here](https://tube.tchncs.de/w/jTSnTrBF2YkUJHEtEoZVrW).</bpmn2:documentation>
+    <bpmn2:extensionElements>
+      <camunda:properties>
+        <camunda:property name="Changelog v1" value="Initial release"/>
+        <camunda:property name="Tags" value="simple,user role assignment,multiple conditions"/>
+        <camunda:property name="Changelog v2" value="Replace role content_moderator with new role moderator to avoid extra dependencies that are derived from permissions"/>
+      </camunda:properties>
+    </bpmn2:extensionElements>
+    <bpmn2:startEvent id="Event_15zaunm" name="Update user" camunda:modelerTemplate="org.drupal.event.content_entity:update">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="content_entity:update"/>
+        </camunda:properties>
+        <camunda:field name="type">
+          <camunda:string>user _all</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_0v2vh5f</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_0s96hes</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:exclusiveGateway id="Gateway_0wn1dan">
+      <bpmn2:incoming>Flow_0v2vh5f</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0tda1xk</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_00nui3m</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:sequenceFlow id="Flow_0v2vh5f" name="C1?" camunda:modelerTemplate="org.drupal.condition.eca_scalar" sourceRef="Event_15zaunm" targetRef="Gateway_0wn1dan">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_scalar"/>
+        </camunda:properties>
+        <camunda:field name="left">
+          <camunda:string>[entity:field_condition_1:value]</camunda:string>
+        </camunda:field>
+        <camunda:field name="operator">
+          <camunda:string>equal</camunda:string>
+        </camunda:field>
+        <camunda:field name="right">
+          <camunda:string>1</camunda:string>
+        </camunda:field>
+        <camunda:field name="type">
+          <camunda:string>value</camunda:string>
+        </camunda:field>
+        <camunda:field name="case">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:exclusiveGateway id="Gateway_1ke52e7">
+      <bpmn2:incoming>Flow_0tda1xk</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1sg0mrf</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_1sluyqv</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:sequenceFlow id="Flow_0tda1xk" name="C2?" camunda:modelerTemplate="org.drupal.condition.eca_scalar" sourceRef="Gateway_0wn1dan" targetRef="Gateway_1ke52e7">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_scalar"/>
+        </camunda:properties>
+        <camunda:field name="left">
+          <camunda:string>[entity:field_condition_2:value]</camunda:string>
+        </camunda:field>
+        <camunda:field name="operator">
+          <camunda:string>equal</camunda:string>
+        </camunda:field>
+        <camunda:field name="right">
+          <camunda:string>1</camunda:string>
+        </camunda:field>
+        <camunda:field name="type">
+          <camunda:string>value</camunda:string>
+        </camunda:field>
+        <camunda:field name="case">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:task id="Activity_0xwx2l0" name="Add role" camunda:modelerTemplate="org.drupal.action.user_add_role_action">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="user_add_role_action"/>
+        </camunda:properties>
+        <camunda:field name="rid">
+          <camunda:string>moderator</camunda:string>
+        </camunda:field>
+        <camunda:field name="object">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="replace_tokens">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1sg0mrf</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1sg0mrf" name="C3?" camunda:modelerTemplate="org.drupal.condition.eca_scalar" sourceRef="Gateway_1ke52e7" targetRef="Activity_0xwx2l0">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_scalar"/>
+        </camunda:properties>
+        <camunda:field name="left">
+          <camunda:string>[entity:field_condition_3:value]</camunda:string>
+        </camunda:field>
+        <camunda:field name="operator">
+          <camunda:string>equal</camunda:string>
+        </camunda:field>
+        <camunda:field name="right">
+          <camunda:string>1</camunda:string>
+        </camunda:field>
+        <camunda:field name="type">
+          <camunda:string>value</camunda:string>
+        </camunda:field>
+        <camunda:field name="case">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:task id="Activity_0nj51qk" name="Remove role" camunda:modelerTemplate="org.drupal.action.user_remove_role_action">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="user_remove_role_action"/>
+        </camunda:properties>
+        <camunda:field name="rid">
+          <camunda:string>moderator</camunda:string>
+        </camunda:field>
+        <camunda:field name="object">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="replace_tokens">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0s96hes</bpmn2:incoming>
+      <bpmn2:incoming>Flow_00nui3m</bpmn2:incoming>
+      <bpmn2:incoming>Flow_1sluyqv</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0s96hes" name="not C1?" camunda:modelerTemplate="org.drupal.condition.eca_scalar" sourceRef="Event_15zaunm" targetRef="Activity_0nj51qk">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_scalar"/>
+        </camunda:properties>
+        <camunda:field name="left">
+          <camunda:string>[entity:field_condition_1:value]</camunda:string>
+        </camunda:field>
+        <camunda:field name="operator">
+          <camunda:string>equal</camunda:string>
+        </camunda:field>
+        <camunda:field name="right">
+          <camunda:string>1</camunda:string>
+        </camunda:field>
+        <camunda:field name="type">
+          <camunda:string>value</camunda:string>
+        </camunda:field>
+        <camunda:field name="case">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="Flow_00nui3m" name="not C2?" camunda:modelerTemplate="org.drupal.condition.eca_scalar" sourceRef="Gateway_0wn1dan" targetRef="Activity_0nj51qk">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_scalar"/>
+        </camunda:properties>
+        <camunda:field name="left">
+          <camunda:string>[entity:field_condition_2:value]</camunda:string>
+        </camunda:field>
+        <camunda:field name="operator">
+          <camunda:string>equal</camunda:string>
+        </camunda:field>
+        <camunda:field name="right">
+          <camunda:string>1</camunda:string>
+        </camunda:field>
+        <camunda:field name="type">
+          <camunda:string>value</camunda:string>
+        </camunda:field>
+        <camunda:field name="case">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="Flow_1sluyqv" name="not C3?" camunda:modelerTemplate="org.drupal.condition.eca_scalar" sourceRef="Gateway_1ke52e7" targetRef="Activity_0nj51qk">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_scalar"/>
+        </camunda:properties>
+        <camunda:field name="left">
+          <camunda:string>[entity:field_condition_3:value]</camunda:string>
+        </camunda:field>
+        <camunda:field name="operator">
+          <camunda:string>equal</camunda:string>
+        </camunda:field>
+        <camunda:field name="right">
+          <camunda:string>1</camunda:string>
+        </camunda:field>
+        <camunda:field name="type">
+          <camunda:string>value</camunda:string>
+        </camunda:field>
+        <camunda:field name="case">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="sid-28a1da21-fe6f-4d1a-929a-c923c0892226">
+    <bpmndi:BPMNPlane id="sid-ca36a2cb-29cd-4b25-a9a5-fe42cfca3b02" bpmnElement="eca_lib_0026">
+      <bpmndi:BPMNShape id="Event_15zaunm_di" bpmnElement="Event_15zaunm">
+        <dc:Bounds x="312" y="152" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="300" y="128" width="60" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0wn1dan_di" bpmnElement="Gateway_0wn1dan" isMarkerVisible="true">
+        <dc:Bounds x="405" y="145" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1ke52e7_di" bpmnElement="Gateway_1ke52e7" isMarkerVisible="true">
+        <dc:Bounds x="515" y="145" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0xwx2l0_di" bpmnElement="Activity_0xwx2l0">
+        <dc:Bounds x="630" y="130" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0nj51qk_di" bpmnElement="Activity_0nj51qk">
+        <dc:Bounds x="630" y="240" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0v2vh5f_di" bpmnElement="Flow_0v2vh5f">
+        <di:waypoint x="348" y="170"/>
+        <di:waypoint x="405" y="170"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="367" y="152" width="21" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0tda1xk_di" bpmnElement="Flow_0tda1xk">
+        <di:waypoint x="455" y="170"/>
+        <di:waypoint x="515" y="170"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="475" y="152" width="21" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1sg0mrf_di" bpmnElement="Flow_1sg0mrf">
+        <di:waypoint x="565" y="170"/>
+        <di:waypoint x="630" y="170"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="587" y="152" width="21" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0s96hes_di" bpmnElement="Flow_0s96hes">
+        <di:waypoint x="348" y="170"/>
+        <di:waypoint x="360" y="170"/>
+        <di:waypoint x="360" y="280"/>
+        <di:waypoint x="630" y="280"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="370" y="203" width="39" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_00nui3m_di" bpmnElement="Flow_00nui3m">
+        <di:waypoint x="460" y="170"/>
+        <di:waypoint x="460" y="280"/>
+        <di:waypoint x="630" y="280"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="466" y="203" width="39" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1sluyqv_di" bpmnElement="Flow_1sluyqv">
+        <di:waypoint x="570" y="170"/>
+        <di:waypoint x="570" y="280"/>
+        <di:waypoint x="630" y="280"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="578" y="203" width="39" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

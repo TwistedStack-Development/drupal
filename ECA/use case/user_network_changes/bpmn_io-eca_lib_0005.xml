@@ -1,0 +1,666 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:qa="http://some-company/schema/bpmn/qa" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:process id="eca_lib_0005" name="User network changes" isExecutable="true" camunda:versionTag="v1">
+    <bpmn2:documentation>Users have references to a number of networks and when one gets added or deleted, this model recognizes the exact change and displays different messages about it.
+
+For further reading, please [go to this tutorial](/resources/tutorials/btown-1/).</bpmn2:documentation>
+    <bpmn2:extensionElements>
+      <camunda:properties>
+        <camunda:property name="Tags" value="use case, loop, custom event"/>
+        <camunda:property name="Changelog v1" value="Initial version"/>
+      </camunda:properties>
+    </bpmn2:extensionElements>
+    <bpmn2:startEvent id="Event_1guyf0x" name="Update user" camunda:modelerTemplate="org.drupal.event.content_entity:update">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="content_entity:update"/>
+        </camunda:properties>
+        <camunda:field name="type">
+          <camunda:string>user user</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_1x58gw4</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_1860eh2" name="Load original version of user (unchanged)" camunda:modelerTemplate="org.drupal.action.eca_token_load_entity">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_token_load_entity"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>unchanged-user</camunda:string>
+        </camunda:field>
+        <camunda:field name="from">
+          <camunda:string>current</camunda:string>
+        </camunda:field>
+        <camunda:field name="entity_type">
+          <camunda:string>user</camunda:string>
+        </camunda:field>
+        <camunda:field name="entity_id">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="revision_id">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="langcode">
+          <camunda:string>_interface</camunda:string>
+        </camunda:field>
+        <camunda:field name="latest_revision">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="unchanged">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+        <camunda:field name="properties">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="object">
+          <camunda:string/>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1x58gw4</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0hnzex5</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_0it7gz7</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1x58gw4" sourceRef="Event_1guyf0x" targetRef="Activity_1860eh2"/>
+    <bpmn2:task id="Activity_0d2xfrh" name="Show Message: no changes" camunda:modelerTemplate="org.drupal.action.action_message_action">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="action_message_action"/>
+        </camunda:properties>
+        <camunda:field name="message">
+          <camunda:string>No changes to networks</camunda:string>
+        </camunda:field>
+        <camunda:field name="replace_tokens">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0hnzex5</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0hnzex5" name="same" camunda:modelerTemplate="org.drupal.condition.eca_scalar" sourceRef="Activity_1860eh2" targetRef="Activity_0d2xfrh">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_scalar"/>
+        </camunda:properties>
+        <camunda:field name="left">
+          <camunda:string>[unchanged-user:field_user_networks]</camunda:string>
+        </camunda:field>
+        <camunda:field name="operator">
+          <camunda:string>equal</camunda:string>
+        </camunda:field>
+        <camunda:field name="right">
+          <camunda:string>[user:field_user_networks]</camunda:string>
+        </camunda:field>
+        <camunda:field name="type">
+          <camunda:string>value</camunda:string>
+        </camunda:field>
+        <camunda:field name="case">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:task id="Activity_1825os9" name="Serialize new networks" camunda:modelerTemplate="org.drupal.action.eca_tamper:encode">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_tamper:encode"/>
+        </camunda:properties>
+        <camunda:field name="eca_data">
+          <camunda:string>[user:field_user_networks]</camunda:string>
+        </camunda:field>
+        <camunda:field name="eca_token_name">
+          <camunda:string>new-networks</camunda:string>
+        </camunda:field>
+        <camunda:field name="mode">
+          <camunda:string>json_encode</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1e23mvj</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0lr1pk8</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0it7gz7" name="different" camunda:modelerTemplate="org.drupal.condition.eca_scalar" sourceRef="Activity_1860eh2" targetRef="Activity_0g3f8fe">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_scalar"/>
+        </camunda:properties>
+        <camunda:field name="left">
+          <camunda:string>[unchanged-user:field_user_networks]</camunda:string>
+        </camunda:field>
+        <camunda:field name="operator">
+          <camunda:string>equal</camunda:string>
+        </camunda:field>
+        <camunda:field name="right">
+          <camunda:string>[user:field_user_networks]</camunda:string>
+        </camunda:field>
+        <camunda:field name="type">
+          <camunda:string>value</camunda:string>
+        </camunda:field>
+        <camunda:field name="case">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:task id="Activity_1fim0pa" name="Serialize orig networks" camunda:modelerTemplate="org.drupal.action.eca_tamper:encode">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_tamper:encode"/>
+        </camunda:properties>
+        <camunda:field name="eca_data">
+          <camunda:string>[unchanged-user:field_user_networks]</camunda:string>
+        </camunda:field>
+        <camunda:field name="eca_token_name">
+          <camunda:string>orig-networks</camunda:string>
+        </camunda:field>
+        <camunda:field name="mode">
+          <camunda:string>json_encode</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_05g94y2</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1oiqot8</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_0zw7chs</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:task id="Activity_0hljae4" name="Custom event: additions" camunda:modelerTemplate="org.drupal.action.eca_trigger_content_entity_custom_event">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_trigger_content_entity_custom_event"/>
+        </camunda:properties>
+        <camunda:field name="event_id">
+          <camunda:string>additions</camunda:string>
+        </camunda:field>
+        <camunda:field name="tokens">
+          <camunda:string>orig-networks</camunda:string>
+        </camunda:field>
+        <camunda:field name="object">
+          <camunda:string>new-networks-list</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1oiqot8</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1oiqot8" sourceRef="Activity_1fim0pa" targetRef="Activity_0hljae4"/>
+    <bpmn2:task id="Activity_1xr82sg" name="Custom event: deletions" camunda:modelerTemplate="org.drupal.action.eca_trigger_content_entity_custom_event">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_trigger_content_entity_custom_event"/>
+        </camunda:properties>
+        <camunda:field name="event_id">
+          <camunda:string>deletions</camunda:string>
+        </camunda:field>
+        <camunda:field name="tokens">
+          <camunda:string>new-networks</camunda:string>
+        </camunda:field>
+        <camunda:field name="object">
+          <camunda:string>orig-networks-list</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0zw7chs</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0zw7chs" sourceRef="Activity_1fim0pa" targetRef="Activity_1xr82sg"/>
+    <bpmn2:startEvent id="Event_1csn7zx" name="additions" camunda:modelerTemplate="org.drupal.event.content_entity:custom">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="content_entity:custom"/>
+        </camunda:properties>
+        <camunda:field name="event_id">
+          <camunda:string>additions</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_0t95jnh</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_0qdn778" name="Load item provided by custom event" camunda:modelerTemplate="org.drupal.action.eca_token_load_entity">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_token_load_entity"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>loaded-term</camunda:string>
+        </camunda:field>
+        <camunda:field name="from">
+          <camunda:string>current</camunda:string>
+        </camunda:field>
+        <camunda:field name="entity_type">
+          <camunda:string>taxonomy_term</camunda:string>
+        </camunda:field>
+        <camunda:field name="entity_id">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="revision_id">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="langcode">
+          <camunda:string>_interface</camunda:string>
+        </camunda:field>
+        <camunda:field name="latest_revision">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="unchanged">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="properties">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="object">
+          <camunda:string/>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0t95jnh</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_088glew</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_0athkxt</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0t95jnh" sourceRef="Event_1csn7zx" targetRef="Activity_0qdn778"/>
+    <bpmn2:task id="Activity_14061cy" name="Message:&#10;new item" camunda:modelerTemplate="org.drupal.action.action_message_action">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="action_message_action"/>
+        </camunda:properties>
+        <camunda:field name="message">
+          <camunda:string>new item: [loaded-term:name]</camunda:string>
+        </camunda:field>
+        <camunda:field name="replace_tokens">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_088glew</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_088glew" camunda:modelerTemplate="org.drupal.condition.eca_scalar" sourceRef="Activity_0qdn778" targetRef="Activity_14061cy">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_scalar"/>
+        </camunda:properties>
+        <camunda:field name="left">
+          <camunda:string>[orig-networks]</camunda:string>
+        </camunda:field>
+        <camunda:field name="operator">
+          <camunda:string>contains</camunda:string>
+        </camunda:field>
+        <camunda:field name="right">
+          <camunda:string>&gt;[loaded-term:name]&lt;</camunda:string>
+        </camunda:field>
+        <camunda:field name="type">
+          <camunda:string>value</camunda:string>
+        </camunda:field>
+        <camunda:field name="case">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:task id="Activity_0oneft6" name="Message:&#10;item exists" camunda:modelerTemplate="org.drupal.action.action_message_action">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="action_message_action"/>
+        </camunda:properties>
+        <camunda:field name="message">
+          <camunda:string>item exist already: [loaded-term:name]</camunda:string>
+        </camunda:field>
+        <camunda:field name="replace_tokens">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0athkxt</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0athkxt" camunda:modelerTemplate="org.drupal.condition.eca_scalar" sourceRef="Activity_0qdn778" targetRef="Activity_0oneft6">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_scalar"/>
+        </camunda:properties>
+        <camunda:field name="left">
+          <camunda:string>[orig-networks]</camunda:string>
+        </camunda:field>
+        <camunda:field name="operator">
+          <camunda:string>contains</camunda:string>
+        </camunda:field>
+        <camunda:field name="right">
+          <camunda:string>&gt;[loaded-term:name]&lt;</camunda:string>
+        </camunda:field>
+        <camunda:field name="type">
+          <camunda:string>value</camunda:string>
+        </camunda:field>
+        <camunda:field name="case">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:startEvent id="Event_1q19rt6" name="deletions" camunda:modelerTemplate="org.drupal.event.content_entity:custom">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="content_entity:custom"/>
+        </camunda:properties>
+        <camunda:field name="event_id">
+          <camunda:string>deletions</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_18yyp9p</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_0bgt876" name="Load item provided by custom event" camunda:modelerTemplate="org.drupal.action.eca_token_load_entity">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_token_load_entity"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>loaded-term</camunda:string>
+        </camunda:field>
+        <camunda:field name="from">
+          <camunda:string>current</camunda:string>
+        </camunda:field>
+        <camunda:field name="entity_type">
+          <camunda:string>taxonomy_term</camunda:string>
+        </camunda:field>
+        <camunda:field name="entity_id">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="revision_id">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="langcode">
+          <camunda:string>_interface</camunda:string>
+        </camunda:field>
+        <camunda:field name="latest_revision">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="unchanged">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="properties">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="object">
+          <camunda:string/>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_18yyp9p</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_07wk72d</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_0cgqt8f</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_18yyp9p" sourceRef="Event_1q19rt6" targetRef="Activity_0bgt876"/>
+    <bpmn2:task id="Activity_04nsgdd" name="Message:&#10;deleted item" camunda:modelerTemplate="org.drupal.action.action_message_action">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="action_message_action"/>
+        </camunda:properties>
+        <camunda:field name="message">
+          <camunda:string>deleted item: [loaded-term:name]</camunda:string>
+        </camunda:field>
+        <camunda:field name="replace_tokens">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_07wk72d</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_07wk72d" camunda:modelerTemplate="org.drupal.condition.eca_scalar" sourceRef="Activity_0bgt876" targetRef="Activity_04nsgdd">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_scalar"/>
+        </camunda:properties>
+        <camunda:field name="left">
+          <camunda:string>[new-networks]</camunda:string>
+        </camunda:field>
+        <camunda:field name="operator">
+          <camunda:string>contains</camunda:string>
+        </camunda:field>
+        <camunda:field name="right">
+          <camunda:string>&gt;[loaded-term:name]&lt;</camunda:string>
+        </camunda:field>
+        <camunda:field name="type">
+          <camunda:string>value</camunda:string>
+        </camunda:field>
+        <camunda:field name="case">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:task id="Activity_0uvnpl0" name="Message:&#10;item remains" camunda:modelerTemplate="org.drupal.action.action_message_action">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="action_message_action"/>
+        </camunda:properties>
+        <camunda:field name="message">
+          <camunda:string>item remains: [loaded-term:name]</camunda:string>
+        </camunda:field>
+        <camunda:field name="replace_tokens">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0cgqt8f</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0cgqt8f" camunda:modelerTemplate="org.drupal.condition.eca_scalar" sourceRef="Activity_0bgt876" targetRef="Activity_0uvnpl0">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_scalar"/>
+        </camunda:properties>
+        <camunda:field name="left">
+          <camunda:string>[new-networks]</camunda:string>
+        </camunda:field>
+        <camunda:field name="operator">
+          <camunda:string>contains</camunda:string>
+        </camunda:field>
+        <camunda:field name="right">
+          <camunda:string>&gt;[loaded-term:name]&lt;</camunda:string>
+        </camunda:field>
+        <camunda:field name="type">
+          <camunda:string>value</camunda:string>
+        </camunda:field>
+        <camunda:field name="case">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:task id="Activity_0g3f8fe" name="Get field value: new networks" camunda:modelerTemplate="org.drupal.action.eca_get_field_value">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_get_field_value"/>
+        </camunda:properties>
+        <camunda:field name="field_name">
+          <camunda:string>field_user_networks</camunda:string>
+        </camunda:field>
+        <camunda:field name="token_name">
+          <camunda:string>new-networks-list</camunda:string>
+        </camunda:field>
+        <camunda:field name="object">
+          <camunda:string>user</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0it7gz7</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1e23mvj</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:task id="Activity_0ms4uf5" name="Get field value: orig networks" camunda:modelerTemplate="org.drupal.action.eca_get_field_value">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_get_field_value"/>
+        </camunda:properties>
+        <camunda:field name="field_name">
+          <camunda:string>field_user_networks</camunda:string>
+        </camunda:field>
+        <camunda:field name="token_name">
+          <camunda:string>orig-networks-list</camunda:string>
+        </camunda:field>
+        <camunda:field name="object">
+          <camunda:string>unchanged-user</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0lr1pk8</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_05g94y2</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1e23mvj" sourceRef="Activity_0g3f8fe" targetRef="Activity_1825os9"/>
+    <bpmn2:sequenceFlow id="Flow_0lr1pk8" sourceRef="Activity_1825os9" targetRef="Activity_0ms4uf5"/>
+    <bpmn2:sequenceFlow id="Flow_05g94y2" sourceRef="Activity_0ms4uf5" targetRef="Activity_1fim0pa"/>
+    <bpmn2:textAnnotation id="TextAnnotation_1tnr65t">
+      <bpmn2:text>there are no connectors here because "additions" and "deletions" is a new custom event that will repeat for each item in the list</bpmn2:text>
+    </bpmn2:textAnnotation>
+    <bpmn2:association id="Association_02vwxo8" sourceRef="Activity_0hljae4" targetRef="TextAnnotation_1tnr65t"/>
+    <bpmn2:association id="Association_1dtrx7x" sourceRef="Activity_1xr82sg" targetRef="TextAnnotation_1tnr65t"/>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="sid-dbd19a87-7906-4bb5-8ade-3fe4bb37cc6b">
+    <bpmndi:BPMNPlane id="sid-2b65c5eb-e9e2-407c-9dfa-321f073d5992" bpmnElement="eca_lib_0005">
+      <bpmndi:BPMNShape id="Event_1guyf0x_di" bpmnElement="Event_1guyf0x">
+        <dc:Bounds x="232" y="112" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="220" y="155" width="60" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1860eh2_di" bpmnElement="Activity_1860eh2">
+        <dc:Bounds x="320" y="90" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0d2xfrh_di" bpmnElement="Activity_0d2xfrh">
+        <dc:Bounds x="480" y="90" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1825os9_di" bpmnElement="Activity_1825os9">
+        <dc:Bounds x="640" y="200" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1fim0pa_di" bpmnElement="Activity_1fim0pa">
+        <dc:Bounds x="960" y="200" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0hljae4_di" bpmnElement="Activity_0hljae4">
+        <dc:Bounds x="1120" y="90" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1xr82sg_di" bpmnElement="Activity_1xr82sg">
+        <dc:Bounds x="1120" y="200" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1csn7zx_di" bpmnElement="Event_1csn7zx">
+        <dc:Bounds x="232" y="402" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="228" y="445" width="45" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0qdn778_di" bpmnElement="Activity_0qdn778">
+        <dc:Bounds x="320" y="380" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_14061cy_di" bpmnElement="Activity_14061cy">
+        <dc:Bounds x="480" y="380" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0oneft6_di" bpmnElement="Activity_0oneft6">
+        <dc:Bounds x="480" y="490" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1q19rt6_di" bpmnElement="Event_1q19rt6">
+        <dc:Bounds x="672" y="402" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="668" y="445" width="45" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0bgt876_di" bpmnElement="Activity_0bgt876">
+        <dc:Bounds x="760" y="380" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_04nsgdd_di" bpmnElement="Activity_04nsgdd">
+        <dc:Bounds x="920" y="380" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0uvnpl0_di" bpmnElement="Activity_0uvnpl0">
+        <dc:Bounds x="920" y="490" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0g3f8fe_di" bpmnElement="Activity_0g3f8fe">
+        <dc:Bounds x="480" y="200" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ms4uf5_di" bpmnElement="Activity_0ms4uf5">
+        <dc:Bounds x="800" y="200" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_1tnr65t_di" bpmnElement="TextAnnotation_1tnr65t">
+        <dc:Bounds x="1290" y="150" width="220" height="68"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1x58gw4_di" bpmnElement="Flow_1x58gw4">
+        <di:waypoint x="268" y="130"/>
+        <di:waypoint x="320" y="130"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0hnzex5_di" bpmnElement="Flow_0hnzex5">
+        <di:waypoint x="420" y="130"/>
+        <di:waypoint x="480" y="130"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="438" y="112" width="27" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0it7gz7_di" bpmnElement="Flow_0it7gz7">
+        <di:waypoint x="370" y="170"/>
+        <di:waypoint x="370" y="240"/>
+        <di:waypoint x="480" y="240"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="390" y="223" width="40" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1oiqot8_di" bpmnElement="Flow_1oiqot8">
+        <di:waypoint x="1060" y="240"/>
+        <di:waypoint x="1090" y="240"/>
+        <di:waypoint x="1090" y="130"/>
+        <di:waypoint x="1120" y="130"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0zw7chs_di" bpmnElement="Flow_0zw7chs">
+        <di:waypoint x="1060" y="240"/>
+        <di:waypoint x="1120" y="240"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0t95jnh_di" bpmnElement="Flow_0t95jnh">
+        <di:waypoint x="268" y="420"/>
+        <di:waypoint x="320" y="420"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_088glew_di" bpmnElement="Flow_088glew">
+        <di:waypoint x="420" y="420"/>
+        <di:waypoint x="480" y="420"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0athkxt_di" bpmnElement="Flow_0athkxt">
+        <di:waypoint x="420" y="420"/>
+        <di:waypoint x="430" y="420"/>
+        <di:waypoint x="430" y="530"/>
+        <di:waypoint x="480" y="530"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_18yyp9p_di" bpmnElement="Flow_18yyp9p">
+        <di:waypoint x="708" y="420"/>
+        <di:waypoint x="760" y="420"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_07wk72d_di" bpmnElement="Flow_07wk72d">
+        <di:waypoint x="860" y="420"/>
+        <di:waypoint x="920" y="420"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0cgqt8f_di" bpmnElement="Flow_0cgqt8f">
+        <di:waypoint x="860" y="420"/>
+        <di:waypoint x="870" y="420"/>
+        <di:waypoint x="870" y="530"/>
+        <di:waypoint x="920" y="530"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1e23mvj_di" bpmnElement="Flow_1e23mvj">
+        <di:waypoint x="580" y="240"/>
+        <di:waypoint x="640" y="240"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0lr1pk8_di" bpmnElement="Flow_0lr1pk8">
+        <di:waypoint x="740" y="240"/>
+        <di:waypoint x="800" y="240"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_05g94y2_di" bpmnElement="Flow_05g94y2">
+        <di:waypoint x="900" y="240"/>
+        <di:waypoint x="960" y="240"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_02vwxo8_di" bpmnElement="Association_02vwxo8">
+        <di:waypoint x="1220" y="140"/>
+        <di:waypoint x="1290" y="155"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_1dtrx7x_di" bpmnElement="Association_1dtrx7x">
+        <di:waypoint x="1220" y="222"/>
+        <di:waypoint x="1290" y="197"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:qa="http://some-company/schema/bpmn/qa" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:process id="eca_lib_0028" name="Access to form fields with tokens" isExecutable="true" camunda:versionTag="v1">
+    <bpmn2:documentation>This model demonstrates how to access form field values during validation or submission, how to find out the proper token syntax for each form field type, and also an alternative approach by building a temporary entity from form field values to use the more transparent entity token syntax.
+
+The creation of this module was recorded and the video with additional explanations [can be watch here](https://tube.tchncs.de/w/oFTsbEQ8RHQZKkswkzmaFf).</bpmn2:documentation>
+    <bpmn2:extensionElements>
+      <camunda:properties>
+        <camunda:property name="Changelog v1" value="Initial version" />
+        <camunda:property name="Tags" value="forms,tokens,syntax,debugging" />
+      </camunda:properties>
+    </bpmn2:extensionElements>
+    <bpmn2:startEvent id="Event_0zx0bxh" name="Validate form" camunda:modelerTemplate="org.drupal.event.form:form_validate">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="form:form_validate" />
+        </camunda:properties>
+        <camunda:field name="form_id">
+          <camunda:string></camunda:string>
+        </camunda:field>
+        <camunda:field name="entity_type_id">
+          <camunda:string>node</camunda:string>
+        </camunda:field>
+        <camunda:field name="bundle">
+          <camunda:string></camunda:string>
+        </camunda:field>
+        <camunda:field name="operation">
+          <camunda:string></camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_0yt6f58</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_0sz9q56</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_0513wxt" name="Message" camunda:modelerTemplate="org.drupal.action.action_message_action">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="action_message_action" />
+        </camunda:properties>
+        <camunda:field name="message">
+          <camunda:string>The value of the text field is 
+[form:values:field_text:0:value] and the flag is set to [form:values:field_flag:value].</camunda:string>
+        </camunda:field>
+        <camunda:field name="replace_tokens">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0yt6f58</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0yt6f58" sourceRef="Event_0zx0bxh" targetRef="Activity_0513wxt" />
+    <bpmn2:task id="Activity_0i1a4y7" name="Build entity" camunda:modelerTemplate="org.drupal.action.eca_form_build_entity">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_form_build_entity" />
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>mylocation</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0sz9q56</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1ckhks0</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0sz9q56" sourceRef="Event_0zx0bxh" targetRef="Activity_0i1a4y7" />
+    <bpmn2:task id="Activity_1ce59o2" name="Message on the entity" camunda:modelerTemplate="org.drupal.action.action_message_action">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="action_message_action" />
+        </camunda:properties>
+        <camunda:field name="message">
+          <camunda:string>Values from the entity: text is "[mylocation:field_text:value]" and flag is "[mylocation:field_flag:value]"</camunda:string>
+        </camunda:field>
+        <camunda:field name="replace_tokens">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1ckhks0</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1ckhks0" sourceRef="Activity_0i1a4y7" targetRef="Activity_1ce59o2" />
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="sid-e48e44fa-10b1-4c7d-935f-7942b9895c10">
+    <bpmndi:BPMNPlane id="sid-3900d32d-bb7c-472d-bf99-52327267e889" bpmnElement="eca_lib_0028">
+      <bpmndi:BPMNShape id="Event_0zx0bxh_di" bpmnElement="Event_0zx0bxh">
+        <dc:Bounds x="412" y="202" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="399" y="245" width="64" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0513wxt_di" bpmnElement="Activity_0513wxt">
+        <dc:Bounds x="660" y="180" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0i1a4y7_di" bpmnElement="Activity_0i1a4y7">
+        <dc:Bounds x="660" y="290" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1ce59o2_di" bpmnElement="Activity_1ce59o2">
+        <dc:Bounds x="860" y="290" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0yt6f58_di" bpmnElement="Flow_0yt6f58">
+        <di:waypoint x="448" y="220" />
+        <di:waypoint x="660" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0sz9q56_di" bpmnElement="Flow_0sz9q56">
+        <di:waypoint x="448" y="220" />
+        <di:waypoint x="550" y="220" />
+        <di:waypoint x="550" y="330" />
+        <di:waypoint x="660" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ckhks0_di" bpmnElement="Flow_1ckhks0">
+        <di:waypoint x="760" y="330" />
+        <di:waypoint x="860" y="330" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

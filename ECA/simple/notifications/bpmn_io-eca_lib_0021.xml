@@ -1,0 +1,517 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:qa="http://some-company/schema/bpmn/qa" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:process id="eca_lib_0021" name="Notifications" isExecutable="true" camunda:versionTag="v1">
+    <bpmn2:documentation>This model responds to a number of events (user login, registration, error messages, new comments, etc.) and send notifications to a number of different channels like email, Mattermost and Alerta.
+
+The creation of this model has been commented and [recorded on video](https://tube.tchncs.de/w/pS9U9PiczAUNjr4xRajVBa).</bpmn2:documentation>
+    <bpmn2:extensionElements>
+      <camunda:properties>
+        <camunda:property name="Tags" value="simple,notifications"/>
+        <camunda:property name="Changelog v1" value="Initial version"/>
+      </camunda:properties>
+    </bpmn2:extensionElements>
+    <bpmn2:startEvent id="Event_19eevce" name="User login" camunda:modelerTemplate="org.drupal.event.user:login">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="user:login"/>
+        </camunda:properties>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_0reg9jb</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_0awy86g" name="Notify email" camunda:modelerTemplate="org.drupal.action.action_send_email_action">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="action_send_email_action"/>
+        </camunda:properties>
+        <camunda:field name="recipient">
+          <camunda:string>admin@example.com</camunda:string>
+        </camunda:field>
+        <camunda:field name="subject">
+          <camunda:string>[subject]</camunda:string>
+        </camunda:field>
+        <camunda:field name="message">
+          <camunda:string>[body]</camunda:string>
+        </camunda:field>
+        <camunda:field name="replace_tokens">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1a4u93j</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:task id="Activity_0flbr1t" name="Notify Alerta" camunda:modelerTemplate="org.drupal.action.push_framework_notify">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="push_framework_notify"/>
+        </camunda:properties>
+        <camunda:field name="channel">
+          <camunda:string>alerta</camunda:string>
+        </camunda:field>
+        <camunda:field name="node_type">
+          <camunda:string>page</camunda:string>
+        </camunda:field>
+        <camunda:field name="body_field">
+          <camunda:string>body</camunda:string>
+        </camunda:field>
+        <camunda:field name="subject">
+          <camunda:string>[subject]</camunda:string>
+        </camunda:field>
+        <camunda:field name="body">
+          <camunda:string>[body]</camunda:string>
+        </camunda:field>
+        <camunda:field name="replace_tokens">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0xkuslx</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:task id="Activity_0k34252" name="Notify Mattermost" camunda:modelerTemplate="org.drupal.action.push_framework_notify">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="push_framework_notify"/>
+        </camunda:properties>
+        <camunda:field name="channel">
+          <camunda:string>mattermost</camunda:string>
+        </camunda:field>
+        <camunda:field name="node_type">
+          <camunda:string>page</camunda:string>
+        </camunda:field>
+        <camunda:field name="body_field">
+          <camunda:string>body</camunda:string>
+        </camunda:field>
+        <camunda:field name="subject">
+          <camunda:string>[subject]</camunda:string>
+        </camunda:field>
+        <camunda:field name="body">
+          <camunda:string>[body]</camunda:string>
+        </camunda:field>
+        <camunda:field name="replace_tokens">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0ka6du5</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:startEvent id="Event_1v0imky" name="User registration" camunda:modelerTemplate="org.drupal.event.content_entity:insert">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="content_entity:insert"/>
+        </camunda:properties>
+        <camunda:field name="type">
+          <camunda:string>user _all</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_05gib1y</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_0w3r04t" name="Set subject" camunda:modelerTemplate="org.drupal.action.eca_token_set_value">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_token_set_value"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>subject</camunda:string>
+        </camunda:field>
+        <camunda:field name="token_value">
+          <camunda:string>User [user:name] just logged in</camunda:string>
+        </camunda:field>
+        <camunda:field name="use_yaml">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0reg9jb</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1ecvleq</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0reg9jb" sourceRef="Event_19eevce" targetRef="Activity_0w3r04t"/>
+    <bpmn2:task id="Activity_1q7h9sv" name="Set body" camunda:modelerTemplate="org.drupal.action.eca_token_set_value">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_token_set_value"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>body</camunda:string>
+        </camunda:field>
+        <camunda:field name="token_value">
+          <camunda:string>Just so that you know.</camunda:string>
+        </camunda:field>
+        <camunda:field name="use_yaml">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1ecvleq</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_18zbie0</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1ecvleq" sourceRef="Activity_0w3r04t" targetRef="Activity_1q7h9sv"/>
+    <bpmn2:task id="Activity_19izh2j" name="Set subject" camunda:modelerTemplate="org.drupal.action.eca_token_set_value">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_token_set_value"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>subject</camunda:string>
+        </camunda:field>
+        <camunda:field name="token_value">
+          <camunda:string>New user registration</camunda:string>
+        </camunda:field>
+        <camunda:field name="use_yaml">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_05gib1y</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0kjfo1b</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_05gib1y" sourceRef="Event_1v0imky" targetRef="Activity_19izh2j"/>
+    <bpmn2:task id="Activity_0zdp6j7" name="Set body" camunda:modelerTemplate="org.drupal.action.eca_token_set_value">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_token_set_value"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>body</camunda:string>
+        </camunda:field>
+        <camunda:field name="token_value">
+          <camunda:string>The name of the new user is [user:name]</camunda:string>
+        </camunda:field>
+        <camunda:field name="use_yaml">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0kjfo1b</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1lqv8co</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0kjfo1b" sourceRef="Activity_19izh2j" targetRef="Activity_0zdp6j7"/>
+    <bpmn2:exclusiveGateway id="Gateway_0ilsm8w">
+      <bpmn2:incoming>Flow_18zbie0</bpmn2:incoming>
+      <bpmn2:incoming>Flow_1lqv8co</bpmn2:incoming>
+      <bpmn2:incoming>Flow_0bk0qoj</bpmn2:incoming>
+      <bpmn2:incoming>Flow_0flj5xl</bpmn2:incoming>
+      <bpmn2:incoming>Flow_0qiig0r</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0xkuslx</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_1a4u93j</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_0ka6du5</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:sequenceFlow id="Flow_18zbie0" sourceRef="Activity_1q7h9sv" targetRef="Gateway_0ilsm8w"/>
+    <bpmn2:sequenceFlow id="Flow_0xkuslx" sourceRef="Gateway_0ilsm8w" targetRef="Activity_0flbr1t"/>
+    <bpmn2:sequenceFlow id="Flow_1a4u93j" sourceRef="Gateway_0ilsm8w" targetRef="Activity_0awy86g"/>
+    <bpmn2:sequenceFlow id="Flow_0ka6du5" sourceRef="Gateway_0ilsm8w" targetRef="Activity_0k34252"/>
+    <bpmn2:sequenceFlow id="Flow_1lqv8co" sourceRef="Activity_0zdp6j7" targetRef="Gateway_0ilsm8w"/>
+    <bpmn2:startEvent id="Event_17mezfz" name="Error in Watchdog" camunda:modelerTemplate="org.drupal.event.log:log_message">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="log:log_message"/>
+        </camunda:properties>
+        <camunda:field name="channel">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="min_severity">
+          <camunda:string>3</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_1iu765x</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_0ybyku0" name="Set subject" camunda:modelerTemplate="org.drupal.action.eca_token_set_value">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_token_set_value"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>subject</camunda:string>
+        </camunda:field>
+        <camunda:field name="token_value">
+          <camunda:string>A new message in watchdog recognized</camunda:string>
+        </camunda:field>
+        <camunda:field name="use_yaml">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1iu765x</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1sws529</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1iu765x" sourceRef="Event_17mezfz" targetRef="Activity_0ybyku0"/>
+    <bpmn2:task id="Activity_1ah2mt5" name="Set body" camunda:modelerTemplate="org.drupal.action.eca_token_set_value">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_token_set_value"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>body</camunda:string>
+        </camunda:field>
+        <camunda:field name="token_value">
+          <camunda:string>Hewre we could put in more details.</camunda:string>
+        </camunda:field>
+        <camunda:field name="use_yaml">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1sws529</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0bk0qoj</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1sws529" sourceRef="Activity_0ybyku0" targetRef="Activity_1ah2mt5"/>
+    <bpmn2:sequenceFlow id="Flow_0bk0qoj" sourceRef="Activity_1ah2mt5" targetRef="Gateway_0ilsm8w"/>
+    <bpmn2:startEvent id="Event_0fdxfbk" name="IP Signalled to CrowdSec" camunda:modelerTemplate="org.drupal.event.crowdsec:signalled">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="crowdsec:signalled"/>
+        </camunda:properties>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_1n0sks0</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_0s12xjb" name="Set subject" camunda:modelerTemplate="org.drupal.action.eca_token_set_value">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_token_set_value"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>subject</camunda:string>
+        </camunda:field>
+        <camunda:field name="token_value">
+          <camunda:string>IP banned</camunda:string>
+        </camunda:field>
+        <camunda:field name="use_yaml">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1n0sks0</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0j7kuu0</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1n0sks0" sourceRef="Event_0fdxfbk" targetRef="Activity_0s12xjb"/>
+    <bpmn2:task id="Activity_1pcbm14" name="Set body" camunda:modelerTemplate="org.drupal.action.eca_token_set_value">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_token_set_value"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>body</camunda:string>
+        </camunda:field>
+        <camunda:field name="token_value">
+          <camunda:string>Not sure why, though!</camunda:string>
+        </camunda:field>
+        <camunda:field name="use_yaml">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0j7kuu0</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0flj5xl</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0j7kuu0" sourceRef="Activity_0s12xjb" targetRef="Activity_1pcbm14"/>
+    <bpmn2:sequenceFlow id="Flow_0flj5xl" sourceRef="Activity_1pcbm14" targetRef="Gateway_0ilsm8w"/>
+    <bpmn2:startEvent id="Event_1q75k1m" name="New comment" camunda:modelerTemplate="org.drupal.event.content_entity:insert">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="content_entity:insert"/>
+        </camunda:properties>
+        <camunda:field name="type">
+          <camunda:string>comment _all</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_035ucwz</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_19mx303" name="Set subject" camunda:modelerTemplate="org.drupal.action.eca_token_set_value">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_token_set_value"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>subject</camunda:string>
+        </camunda:field>
+        <camunda:field name="token_value">
+          <camunda:string>A new comment on your website</camunda:string>
+        </camunda:field>
+        <camunda:field name="use_yaml">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_035ucwz</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1fgbhqb</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_035ucwz" sourceRef="Event_1q75k1m" targetRef="Activity_19mx303"/>
+    <bpmn2:task id="Activity_1gtasg7" name="Set body" camunda:modelerTemplate="org.drupal.action.eca_token_set_value">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_token_set_value"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>body</camunda:string>
+        </camunda:field>
+        <camunda:field name="token_value">
+          <camunda:string>Check it at [entity:url]</camunda:string>
+        </camunda:field>
+        <camunda:field name="use_yaml">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1fgbhqb</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0qiig0r</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1fgbhqb" sourceRef="Activity_19mx303" targetRef="Activity_1gtasg7"/>
+    <bpmn2:sequenceFlow id="Flow_0qiig0r" sourceRef="Activity_1gtasg7" targetRef="Gateway_0ilsm8w"/>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="sid-db6c26a0-2809-4833-9783-046105b20a7d">
+    <bpmndi:BPMNPlane id="sid-45586d9c-2d6f-40d5-9448-af5cfcde8899" bpmnElement="eca_lib_0021">
+      <bpmndi:BPMNShape id="Event_19eevce_di" bpmnElement="Event_19eevce">
+        <dc:Bounds x="282" y="72" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="275" y="115" width="50" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0awy86g_di" bpmnElement="Activity_0awy86g">
+        <dc:Bounds x="810" y="50" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0flbr1t_di" bpmnElement="Activity_0flbr1t">
+        <dc:Bounds x="810" y="-70" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0k34252_di" bpmnElement="Activity_0k34252">
+        <dc:Bounds x="810" y="160" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1v0imky_di" bpmnElement="Event_1v0imky">
+        <dc:Bounds x="282" y="172" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="260" y="215" width="81" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0w3r04t_di" bpmnElement="Activity_0w3r04t">
+        <dc:Bounds x="370" y="50" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1q7h9sv_di" bpmnElement="Activity_1q7h9sv">
+        <dc:Bounds x="530" y="50" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_19izh2j_di" bpmnElement="Activity_19izh2j">
+        <dc:Bounds x="370" y="150" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0zdp6j7_di" bpmnElement="Activity_0zdp6j7">
+        <dc:Bounds x="530" y="150" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0ilsm8w_di" bpmnElement="Gateway_0ilsm8w" isMarkerVisible="true">
+        <dc:Bounds x="695" y="65" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_17mezfz_di" bpmnElement="Event_17mezfz">
+        <dc:Bounds x="282" y="292" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="257" y="335" width="89" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ybyku0_di" bpmnElement="Activity_0ybyku0">
+        <dc:Bounds x="370" y="270" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1ah2mt5_di" bpmnElement="Activity_1ah2mt5">
+        <dc:Bounds x="530" y="270" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0fdxfbk_di" bpmnElement="Event_0fdxfbk">
+        <dc:Bounds x="282" y="412" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="266" y="455" width="71" height="27"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0s12xjb_di" bpmnElement="Activity_0s12xjb">
+        <dc:Bounds x="370" y="390" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1pcbm14_di" bpmnElement="Activity_1pcbm14">
+        <dc:Bounds x="530" y="390" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1q75k1m_di" bpmnElement="Event_1q75k1m">
+        <dc:Bounds x="282" y="522" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="265" y="565" width="71" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_19mx303_di" bpmnElement="Activity_19mx303">
+        <dc:Bounds x="370" y="500" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1gtasg7_di" bpmnElement="Activity_1gtasg7">
+        <dc:Bounds x="530" y="500" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0reg9jb_di" bpmnElement="Flow_0reg9jb">
+        <di:waypoint x="318" y="90"/>
+        <di:waypoint x="370" y="90"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ecvleq_di" bpmnElement="Flow_1ecvleq">
+        <di:waypoint x="470" y="90"/>
+        <di:waypoint x="530" y="90"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_05gib1y_di" bpmnElement="Flow_05gib1y">
+        <di:waypoint x="318" y="190"/>
+        <di:waypoint x="370" y="190"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0kjfo1b_di" bpmnElement="Flow_0kjfo1b">
+        <di:waypoint x="470" y="190"/>
+        <di:waypoint x="530" y="190"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_18zbie0_di" bpmnElement="Flow_18zbie0">
+        <di:waypoint x="630" y="90"/>
+        <di:waypoint x="695" y="90"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0xkuslx_di" bpmnElement="Flow_0xkuslx">
+        <di:waypoint x="720" y="65"/>
+        <di:waypoint x="720" y="-30"/>
+        <di:waypoint x="810" y="-30"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1a4u93j_di" bpmnElement="Flow_1a4u93j">
+        <di:waypoint x="745" y="90"/>
+        <di:waypoint x="810" y="90"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ka6du5_di" bpmnElement="Flow_0ka6du5">
+        <di:waypoint x="720" y="115"/>
+        <di:waypoint x="720" y="200"/>
+        <di:waypoint x="810" y="200"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1lqv8co_di" bpmnElement="Flow_1lqv8co">
+        <di:waypoint x="630" y="190"/>
+        <di:waypoint x="660" y="190"/>
+        <di:waypoint x="660" y="90"/>
+        <di:waypoint x="695" y="90"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1iu765x_di" bpmnElement="Flow_1iu765x">
+        <di:waypoint x="318" y="310"/>
+        <di:waypoint x="370" y="310"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1sws529_di" bpmnElement="Flow_1sws529">
+        <di:waypoint x="470" y="310"/>
+        <di:waypoint x="530" y="310"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0bk0qoj_di" bpmnElement="Flow_0bk0qoj">
+        <di:waypoint x="630" y="310"/>
+        <di:waypoint x="660" y="310"/>
+        <di:waypoint x="660" y="90"/>
+        <di:waypoint x="695" y="90"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1n0sks0_di" bpmnElement="Flow_1n0sks0">
+        <di:waypoint x="318" y="430"/>
+        <di:waypoint x="370" y="430"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0j7kuu0_di" bpmnElement="Flow_0j7kuu0">
+        <di:waypoint x="470" y="430"/>
+        <di:waypoint x="530" y="430"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0flj5xl_di" bpmnElement="Flow_0flj5xl">
+        <di:waypoint x="630" y="430"/>
+        <di:waypoint x="660" y="430"/>
+        <di:waypoint x="660" y="90"/>
+        <di:waypoint x="695" y="90"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_035ucwz_di" bpmnElement="Flow_035ucwz">
+        <di:waypoint x="318" y="540"/>
+        <di:waypoint x="370" y="540"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1fgbhqb_di" bpmnElement="Flow_1fgbhqb">
+        <di:waypoint x="470" y="540"/>
+        <di:waypoint x="530" y="540"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0qiig0r_di" bpmnElement="Flow_0qiig0r">
+        <di:waypoint x="630" y="540"/>
+        <di:waypoint x="660" y="540"/>
+        <di:waypoint x="660" y="90"/>
+        <di:waypoint x="695" y="90"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

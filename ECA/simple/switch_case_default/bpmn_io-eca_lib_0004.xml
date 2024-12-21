@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:qa="http://some-company/schema/bpmn/qa" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:process id="eca_lib_0004" name="Switch Case Default" isExecutable="true" camunda:versionTag="v1">
+    <bpmn2:documentation>Demonstrate how typical switch-case PHP constructors could be simulated in ECA models - similar to if-elsif-else statements.
+
+The model is similar to what you would normally do in PHP like this:
+
+```php
+switch ($field_select) {
+  case 'a1':
+  case 'a2':
+  case 'a3':
+  case 'c7':
+    // Set Status to 3
+    $field_status = 3;
+
+  case 'b1':
+  case 'b2':
+    // Set Status to 4
+    $field_status = 4;
+
+  default:
+    // Set default Status
+    $field_status = 2;
+}
+```
+</bpmn2:documentation>
+    <bpmn2:extensionElements>
+      <camunda:properties>
+        <camunda:property name="Tags" value="simple,switch-case-default,if-elsif-else,PHP,programming"/>
+        <camunda:property name="Changelog v1" value="Initial version"/>
+      </camunda:properties>
+    </bpmn2:extensionElements>
+    <bpmn2:startEvent id="Event_082luue" name="Presave article" camunda:modelerTemplate="org.drupal.event.content_entity:presave">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="content_entity:presave"/>
+        </camunda:properties>
+        <camunda:field name="type">
+          <camunda:string>node article</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_080ikau</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_0yz4n6i" name="Set Status to 3" camunda:modelerTemplate="org.drupal.action.eca_set_field_value">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_set_field_value"/>
+        </camunda:properties>
+        <camunda:field name="method">
+          <camunda:string>set:clear</camunda:string>
+        </camunda:field>
+        <camunda:field name="strip_tags">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="trim">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="field_name">
+          <camunda:string>field_status</camunda:string>
+        </camunda:field>
+        <camunda:field name="save_entity">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="field_value">
+          <camunda:string>3</camunda:string>
+        </camunda:field>
+        <camunda:field name="object">
+          <camunda:string/>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1jpugw8</bpmn2:incoming>
+      <bpmn2:incoming>Flow_0ti9bxh</bpmn2:incoming>
+      <bpmn2:incoming>Flow_01kgpwh</bpmn2:incoming>
+      <bpmn2:incoming>Flow_08ravmy</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1jpugw8" name="a3" camunda:modelerTemplate="org.drupal.condition.eca_entity_field_value" sourceRef="Activity_1x79dx8" targetRef="Activity_0yz4n6i">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_entity_field_value"/>
+        </camunda:properties>
+        <camunda:field name="field_name">
+          <camunda:string>field_select</camunda:string>
+        </camunda:field>
+        <camunda:field name="operator">
+          <camunda:string>equal</camunda:string>
+        </camunda:field>
+        <camunda:field name="expected_value">
+          <camunda:string>a3</camunda:string>
+        </camunda:field>
+        <camunda:field name="type">
+          <camunda:string>value</camunda:string>
+        </camunda:field>
+        <camunda:field name="case">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="entity">
+          <camunda:string/>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="Flow_0ti9bxh" name="a2" camunda:modelerTemplate="org.drupal.condition.eca_entity_field_value" sourceRef="Activity_1x79dx8" targetRef="Activity_0yz4n6i">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_entity_field_value"/>
+        </camunda:properties>
+        <camunda:field name="field_name">
+          <camunda:string>field_select</camunda:string>
+        </camunda:field>
+        <camunda:field name="operator">
+          <camunda:string>equal</camunda:string>
+        </camunda:field>
+        <camunda:field name="expected_value">
+          <camunda:string>a2</camunda:string>
+        </camunda:field>
+        <camunda:field name="type">
+          <camunda:string>value</camunda:string>
+        </camunda:field>
+        <camunda:field name="case">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="entity">
+          <camunda:string/>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="Flow_01kgpwh" name="a1" camunda:modelerTemplate="org.drupal.condition.eca_entity_field_value" sourceRef="Activity_1x79dx8" targetRef="Activity_0yz4n6i">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_entity_field_value"/>
+        </camunda:properties>
+        <camunda:field name="field_name">
+          <camunda:string>field_select</camunda:string>
+        </camunda:field>
+        <camunda:field name="operator">
+          <camunda:string>equal</camunda:string>
+        </camunda:field>
+        <camunda:field name="expected_value">
+          <camunda:string>a1</camunda:string>
+        </camunda:field>
+        <camunda:field name="type">
+          <camunda:string>value</camunda:string>
+        </camunda:field>
+        <camunda:field name="case">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="entity">
+          <camunda:string/>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="Flow_08ravmy" name="c7" camunda:modelerTemplate="org.drupal.condition.eca_entity_field_value" sourceRef="Activity_1x79dx8" targetRef="Activity_0yz4n6i">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_entity_field_value"/>
+        </camunda:properties>
+        <camunda:field name="field_name">
+          <camunda:string>field_select</camunda:string>
+        </camunda:field>
+        <camunda:field name="operator">
+          <camunda:string>equal</camunda:string>
+        </camunda:field>
+        <camunda:field name="expected_value">
+          <camunda:string>c7</camunda:string>
+        </camunda:field>
+        <camunda:field name="type">
+          <camunda:string>value</camunda:string>
+        </camunda:field>
+        <camunda:field name="case">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="entity">
+          <camunda:string/>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:task id="Activity_0anrk10" name="Set Status to 4" camunda:modelerTemplate="org.drupal.action.eca_set_field_value">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_set_field_value"/>
+        </camunda:properties>
+        <camunda:field name="method">
+          <camunda:string>set:clear</camunda:string>
+        </camunda:field>
+        <camunda:field name="strip_tags">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="trim">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="field_name">
+          <camunda:string>field_status</camunda:string>
+        </camunda:field>
+        <camunda:field name="save_entity">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="field_value">
+          <camunda:string>4</camunda:string>
+        </camunda:field>
+        <camunda:field name="object">
+          <camunda:string/>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0nrihfy</bpmn2:incoming>
+      <bpmn2:incoming>Flow_0usiojw</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0nrihfy" name="b1" camunda:modelerTemplate="org.drupal.condition.eca_entity_field_value" sourceRef="Activity_1x79dx8" targetRef="Activity_0anrk10">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_entity_field_value"/>
+        </camunda:properties>
+        <camunda:field name="field_name">
+          <camunda:string>field_select</camunda:string>
+        </camunda:field>
+        <camunda:field name="operator">
+          <camunda:string>equal</camunda:string>
+        </camunda:field>
+        <camunda:field name="expected_value">
+          <camunda:string>b1</camunda:string>
+        </camunda:field>
+        <camunda:field name="type">
+          <camunda:string>value</camunda:string>
+        </camunda:field>
+        <camunda:field name="case">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="entity">
+          <camunda:string/>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="Flow_0usiojw" name="b2" camunda:modelerTemplate="org.drupal.condition.eca_entity_field_value" sourceRef="Activity_1x79dx8" targetRef="Activity_0anrk10">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_entity_field_value"/>
+        </camunda:properties>
+        <camunda:field name="field_name">
+          <camunda:string>field_select</camunda:string>
+        </camunda:field>
+        <camunda:field name="operator">
+          <camunda:string>equal</camunda:string>
+        </camunda:field>
+        <camunda:field name="expected_value">
+          <camunda:string>b2</camunda:string>
+        </camunda:field>
+        <camunda:field name="type">
+          <camunda:string>value</camunda:string>
+        </camunda:field>
+        <camunda:field name="case">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="entity">
+          <camunda:string/>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:task id="Activity_1x79dx8" name="Set default Status" camunda:modelerTemplate="org.drupal.action.eca_set_field_value">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_set_field_value"/>
+        </camunda:properties>
+        <camunda:field name="method">
+          <camunda:string>set:clear</camunda:string>
+        </camunda:field>
+        <camunda:field name="strip_tags">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="trim">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="field_name">
+          <camunda:string>field_status</camunda:string>
+        </camunda:field>
+        <camunda:field name="save_entity">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="field_value">
+          <camunda:string>2</camunda:string>
+        </camunda:field>
+        <camunda:field name="object">
+          <camunda:string/>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_080ikau</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1jpugw8</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_0ti9bxh</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_01kgpwh</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_08ravmy</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_0nrihfy</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_0usiojw</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_080ikau" sourceRef="Event_082luue" targetRef="Activity_1x79dx8"/>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="sid-4401d4a3-e2ed-450e-8200-aa601cf73769">
+    <bpmndi:BPMNPlane id="sid-6de9c83a-5f4d-4589-bf9c-326c3b018280" bpmnElement="eca_lib_0004">
+      <bpmndi:BPMNShape id="Event_082luue_di" bpmnElement="Event_082luue">
+        <dc:Bounds x="542" y="242" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="526" y="285" width="73" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0yz4n6i_di" bpmnElement="Activity_0yz4n6i">
+        <dc:Bounds x="970" y="220" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0anrk10_di" bpmnElement="Activity_0anrk10">
+        <dc:Bounds x="970" y="320" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1x79dx8_di" bpmnElement="Activity_1x79dx8">
+        <dc:Bounds x="640" y="220" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1jpugw8_di" bpmnElement="Flow_1jpugw8">
+        <di:waypoint x="690" y="220"/>
+        <di:waypoint x="690" y="150"/>
+        <di:waypoint x="1020" y="150"/>
+        <di:waypoint x="1020" y="220"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="833" y="132" width="13" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ti9bxh_di" bpmnElement="Flow_0ti9bxh">
+        <di:waypoint x="690" y="220"/>
+        <di:waypoint x="690" y="170"/>
+        <di:waypoint x="1020" y="170"/>
+        <di:waypoint x="1020" y="220"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="833" y="153" width="13" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_01kgpwh_di" bpmnElement="Flow_01kgpwh">
+        <di:waypoint x="690" y="220"/>
+        <di:waypoint x="690" y="190"/>
+        <di:waypoint x="1020" y="190"/>
+        <di:waypoint x="1020" y="220"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="833" y="172" width="13" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_08ravmy_di" bpmnElement="Flow_08ravmy">
+        <di:waypoint x="690" y="220"/>
+        <di:waypoint x="690" y="130"/>
+        <di:waypoint x="1020" y="130"/>
+        <di:waypoint x="1020" y="220"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="834" y="113" width="12" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0nrihfy_di" bpmnElement="Flow_0nrihfy">
+        <di:waypoint x="690" y="300"/>
+        <di:waypoint x="690" y="340"/>
+        <di:waypoint x="970" y="340"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="833" y="323" width="13" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0usiojw_di" bpmnElement="Flow_0usiojw">
+        <di:waypoint x="690" y="300"/>
+        <di:waypoint x="690" y="360"/>
+        <di:waypoint x="970" y="360"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="833" y="343" width="13" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_080ikau_di" bpmnElement="Flow_080ikau">
+        <di:waypoint x="578" y="260"/>
+        <di:waypoint x="640" y="260"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

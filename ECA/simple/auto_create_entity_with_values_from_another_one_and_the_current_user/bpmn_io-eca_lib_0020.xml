@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:qa="http://some-company/schema/bpmn/qa" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:process id="eca_lib_0020" name="Auto create entity with values from another one and the current user" isExecutable="true" camunda:versionTag="v1">
+    <bpmn2:documentation>This model reacts upon creating a new page node. It then creates a new article node, its title is populated with the page auther's name, some static text and the title of the created page.
+
+The [recorded video](https://tube.tchncs.de/w/2nSZ9TDmtZ5YYrnyFfaNUC) provides more explanation as we go on.</bpmn2:documentation>
+    <bpmn2:extensionElements>
+      <camunda:properties>
+        <camunda:property name="Changelog v1" value="Initial version"/>
+        <camunda:property name="Tags" value="simple,entity,set field values"/>
+      </camunda:properties>
+    </bpmn2:extensionElements>
+    <bpmn2:startEvent id="Event_1l5lwit" name="Insert new page" camunda:modelerTemplate="org.drupal.event.content_entity:insert">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="content_entity:insert"/>
+        </camunda:properties>
+        <camunda:field name="type">
+          <camunda:string>node page</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_0ebrxho</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_01l44yz" name="Create a new article" camunda:modelerTemplate="org.drupal.action.eca_new_entity">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_new_entity"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>newarticle</camunda:string>
+        </camunda:field>
+        <camunda:field name="type">
+          <camunda:string>node article</camunda:string>
+        </camunda:field>
+        <camunda:field name="langcode">
+          <camunda:string>en</camunda:string>
+        </camunda:field>
+        <camunda:field name="label">
+          <camunda:string>[user:name] just created [node:title]</camunda:string>
+        </camunda:field>
+        <camunda:field name="published">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+        <camunda:field name="owner">
+          <camunda:string>[user:id]</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0ebrxho</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0lhnngv</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0ebrxho" sourceRef="Event_1l5lwit" targetRef="Activity_01l44yz"/>
+    <bpmn2:task id="Activity_19047vb" name="Save" camunda:modelerTemplate="org.drupal.action.eca_save_entity">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_save_entity"/>
+        </camunda:properties>
+        <camunda:field name="object">
+          <camunda:string>newarticle</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0lhnngv</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0f9oq0n</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0lhnngv" sourceRef="Activity_01l44yz" targetRef="Activity_19047vb"/>
+    <bpmn2:task id="Activity_0r36kpa" name="Message" camunda:modelerTemplate="org.drupal.action.action_message_action">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="action_message_action"/>
+        </camunda:properties>
+        <camunda:field name="message">
+          <camunda:string>Also created a new article &lt;a href="[newarticle:url]"&gt;[newarticle:title]&lt;/a&gt;</camunda:string>
+        </camunda:field>
+        <camunda:field name="replace_tokens">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0f9oq0n</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0f9oq0n" sourceRef="Activity_19047vb" targetRef="Activity_0r36kpa"/>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="sid-9a8cdf29-1b64-41f2-90e3-873e229961e3">
+    <bpmndi:BPMNPlane id="sid-07a6c91c-d07c-4cb3-8156-5912421dbf1b" bpmnElement="eca_lib_0020">
+      <bpmndi:BPMNShape id="Event_1l5lwit_di" bpmnElement="Event_1l5lwit">
+        <dc:Bounds x="432" y="132" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="411" y="175" width="79" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_01l44yz_di" bpmnElement="Activity_01l44yz">
+        <dc:Bounds x="520" y="110" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_19047vb_di" bpmnElement="Activity_19047vb">
+        <dc:Bounds x="680" y="110" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0r36kpa_di" bpmnElement="Activity_0r36kpa">
+        <dc:Bounds x="840" y="110" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0ebrxho_di" bpmnElement="Flow_0ebrxho">
+        <di:waypoint x="468" y="150"/>
+        <di:waypoint x="520" y="150"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0lhnngv_di" bpmnElement="Flow_0lhnngv">
+        <di:waypoint x="620" y="150"/>
+        <di:waypoint x="680" y="150"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0f9oq0n_di" bpmnElement="Flow_0f9oq0n">
+        <di:waypoint x="780" y="150"/>
+        <di:waypoint x="840" y="150"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

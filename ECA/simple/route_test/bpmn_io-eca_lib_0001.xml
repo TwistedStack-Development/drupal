@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:qa="http://some-company/schema/bpmn/qa" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:process id="ECA_Lib_0001" name="Route test" isExecutable="true" camunda:versionTag="v2">
+    <bpmn2:documentation>If a node page gets requested and the node is of type "article", a message will be printed.
+
+This is using the event [Controller found to handle request](https://ecaguide.org/plugins/eca/misc/events/kernel_controller/?h=controller+found+handle+request) as thiss is working even if pages are cached.</bpmn2:documentation>
+    <bpmn2:extensionElements>
+      <camunda:properties>
+        <camunda:property name="Tags" value="simple,route,token,node"/>
+        <camunda:property name="Changelog v1" value="Initial version"/>
+        <camunda:property name="Changelog v2" value="Updated to latest plugin versions, fixed some typos, change the event from &quot;Start dispatching request&quot; to &quot;Controller found to handle request&quot;"/>
+      </camunda:properties>
+    </bpmn2:extensionElements>
+    <bpmn2:startEvent id="Event_0l86rxh" name="Found controller" camunda:modelerTemplate="org.drupal.event.kernel:controller">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="kernel:controller"/>
+        </camunda:properties>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_0vgujvv</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_0yxnsha" name="Add node from route to token" camunda:modelerTemplate="org.drupal.action.eca_token_load_route_param">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_token_load_route_param"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>mynode</camunda:string>
+        </camunda:field>
+        <camunda:field name="parameter_name">
+          <camunda:string>node</camunda:string>
+        </camunda:field>
+        <camunda:field name="request">
+          <camunda:string>2</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0vgujvv</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_057atra</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0vgujvv" name="Is it a node request?" camunda:modelerTemplate="org.drupal.condition.eca_route_match" sourceRef="Event_0l86rxh" targetRef="Activity_0yxnsha">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_route_match"/>
+        </camunda:properties>
+        <camunda:field name="operator">
+          <camunda:string>equal</camunda:string>
+        </camunda:field>
+        <camunda:field name="route">
+          <camunda:string>entity.node.canonical</camunda:string>
+        </camunda:field>
+        <camunda:field name="type">
+          <camunda:string>value</camunda:string>
+        </camunda:field>
+        <camunda:field name="case">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="request">
+          <camunda:string>2</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:task id="Activity_1bcku98" name="Print node title as message" camunda:modelerTemplate="org.drupal.action.action_message_action">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="action_message_action"/>
+        </camunda:properties>
+        <camunda:field name="message">
+          <camunda:string>You are visiting "[mynode:title]"</camunda:string>
+        </camunda:field>
+        <camunda:field name="replace_tokens">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_057atra</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_057atra" name="Is it an article?" camunda:modelerTemplate="org.drupal.condition.eca_entity_type_bundle" sourceRef="Activity_0yxnsha" targetRef="Activity_1bcku98">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_entity_type_bundle"/>
+        </camunda:properties>
+        <camunda:field name="type">
+          <camunda:string>node article</camunda:string>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="entity">
+          <camunda:string>mynode</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="sid-c4cc2aba-38be-41bc-9c9c-1bd2c06a402f">
+    <bpmndi:BPMNPlane id="sid-82cbdb3a-43a7-4a22-8b63-5aa1fb0fc600" bpmnElement="ECA_Lib_0001">
+      <bpmndi:BPMNShape id="Event_0l86rxh_di" bpmnElement="Event_0l86rxh">
+        <dc:Bounds x="382" y="112" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="361" y="155" width="80" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0yxnsha_di" bpmnElement="Activity_0yxnsha">
+        <dc:Bounds x="580" y="90" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1bcku98_di" bpmnElement="Activity_1bcku98">
+        <dc:Bounds x="820" y="90" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0vgujvv_di" bpmnElement="Flow_0vgujvv">
+        <di:waypoint x="418" y="130"/>
+        <di:waypoint x="580" y="130"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="472" y="96" width="54" height="27"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_057atra_di" bpmnElement="Flow_057atra">
+        <di:waypoint x="680" y="130"/>
+        <di:waypoint x="820" y="130"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="715" y="112" width="71" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

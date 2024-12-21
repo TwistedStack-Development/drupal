@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:qa="http://some-company/schema/bpmn/qa" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:process id="eca_lib_0009" name="Content validation" isExecutable="true" camunda:versionTag="v2">
+    <bpmn2:documentation>This example model changes the behaviour when editing a content of type "article" in a form:
+- It groups the title and body field together
+- It makes sure that the body field is not empty, when trying to publish the article.</bpmn2:documentation>
+    <bpmn2:extensionElements>
+      <camunda:properties>
+        <camunda:property name="Changelog v1" value="Initial version" />
+        <camunda:property name="Tags" value="forms,field group,form field validation" />
+        <camunda:property name="Changelog v2" value="Fixing title field" />
+      </camunda:properties>
+    </bpmn2:extensionElements>
+    <bpmn2:startEvent id="Event_07t9bjm" name="Processing article form" camunda:modelerTemplate="org.drupal.event.form:form_process">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="form:form_process" />
+        </camunda:properties>
+        <camunda:field name="form_id">
+          <camunda:string></camunda:string>
+        </camunda:field>
+        <camunda:field name="entity_type_id">
+          <camunda:string>node</camunda:string>
+        </camunda:field>
+        <camunda:field name="bundle">
+          <camunda:string>article</camunda:string>
+        </camunda:field>
+        <camunda:field name="operation">
+          <camunda:string>default, edit</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_1c4lsz3</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_0oquvx2" name="Group title and body into &#34;Authoring&#34;" camunda:modelerTemplate="org.drupal.action.eca_form_add_group_element">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_form_add_group_element" />
+        </camunda:properties>
+        <camunda:field name="name">
+          <camunda:string>authoring</camunda:string>
+        </camunda:field>
+        <camunda:field name="title">
+          <camunda:string>Authoring</camunda:string>
+        </camunda:field>
+        <camunda:field name="open">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+        <camunda:field name="weight">
+          <camunda:string>0</camunda:string>
+        </camunda:field>
+        <camunda:field name="fields">
+          <camunda:string>title[0][value], body</camunda:string>
+        </camunda:field>
+        <camunda:field name="introduction_text">
+          <camunda:string></camunda:string>
+        </camunda:field>
+        <camunda:field name="summary_value">
+          <camunda:string></camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1c4lsz3</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1c4lsz3" sourceRef="Event_07t9bjm" targetRef="Activity_0oquvx2" />
+    <bpmn2:startEvent id="Event_0obipdz" name="Validating article form" camunda:modelerTemplate="org.drupal.event.form:form_validate">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="form:form_validate" />
+        </camunda:properties>
+        <camunda:field name="form_id">
+          <camunda:string></camunda:string>
+        </camunda:field>
+        <camunda:field name="entity_type_id">
+          <camunda:string>node</camunda:string>
+        </camunda:field>
+        <camunda:field name="bundle">
+          <camunda:string>article</camunda:string>
+        </camunda:field>
+        <camunda:field name="operation">
+          <camunda:string>default, edit</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_0dux81p</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_0kuu2di" name="Build node from submitted values" camunda:modelerTemplate="org.drupal.action.eca_form_build_entity">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_form_build_entity" />
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>node</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0dux81p</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1vzdsli</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0dux81p" sourceRef="Event_0obipdz" targetRef="Activity_0kuu2di" />
+    <bpmn2:task id="Activity_1wmvbc3" name="Chain for AND condition" camunda:modelerTemplate="org.drupal.action.eca_void_and_condition">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_void_and_condition" />
+        </camunda:properties>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1vzdsli</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1oy6uax</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1vzdsli" name="Set to be published?" camunda:modelerTemplate="org.drupal.condition.eca_entity_field_value" sourceRef="Activity_0kuu2di" targetRef="Activity_1wmvbc3">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_entity_field_value" />
+        </camunda:properties>
+        <camunda:field name="field_name">
+          <camunda:string>status</camunda:string>
+        </camunda:field>
+        <camunda:field name="operator">
+          <camunda:string>equal</camunda:string>
+        </camunda:field>
+        <camunda:field name="expected_value">
+          <camunda:string>1</camunda:string>
+        </camunda:field>
+        <camunda:field name="type">
+          <camunda:string>value</camunda:string>
+        </camunda:field>
+        <camunda:field name="case">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="entity">
+          <camunda:string>node</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:task id="Activity_0qj9rwm" name="Set validation error on body field" camunda:modelerTemplate="org.drupal.action.eca_form_field_set_error">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_form_field_set_error" />
+        </camunda:properties>
+        <camunda:field name="field_name">
+          <camunda:string>body</camunda:string>
+        </camunda:field>
+        <camunda:field name="message">
+          <camunda:string>The body must have a text when this article is supposed to be published.</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1oy6uax</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1oy6uax" name="Body is empty?" camunda:modelerTemplate="org.drupal.condition.eca_entity_field_value_empty" sourceRef="Activity_1wmvbc3" targetRef="Activity_0qj9rwm">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_entity_field_value_empty" />
+        </camunda:properties>
+        <camunda:field name="field_name">
+          <camunda:string>body</camunda:string>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="entity">
+          <camunda:string>node</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="sid-2c7133c8-80df-4bca-9cc3-c476ee2199b5">
+    <bpmndi:BPMNPlane id="sid-312ca64b-21d3-47e5-af2d-b16450bd2e25" bpmnElement="eca_lib_0009">
+      <bpmndi:BPMNShape id="Event_07t9bjm_di" bpmnElement="Event_07t9bjm">
+        <dc:Bounds x="222" y="132" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="197" y="175" width="87" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0oquvx2_di" bpmnElement="Activity_0oquvx2">
+        <dc:Bounds x="380" y="110" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0obipdz_di" bpmnElement="Event_0obipdz">
+        <dc:Bounds x="222" y="282" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="200" y="325" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0kuu2di_di" bpmnElement="Activity_0kuu2di">
+        <dc:Bounds x="380" y="260" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1wmvbc3_di" bpmnElement="Activity_1wmvbc3">
+        <dc:Bounds x="600" y="260" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0qj9rwm_di" bpmnElement="Activity_0qj9rwm">
+        <dc:Bounds x="820" y="260" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1c4lsz3_di" bpmnElement="Flow_1c4lsz3">
+        <di:waypoint x="258" y="150" />
+        <di:waypoint x="380" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0dux81p_di" bpmnElement="Flow_0dux81p">
+        <di:waypoint x="258" y="300" />
+        <di:waypoint x="380" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1vzdsli_di" bpmnElement="Flow_1vzdsli">
+        <di:waypoint x="480" y="300" />
+        <di:waypoint x="600" y="300" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="513" y="266" width="54" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1oy6uax_di" bpmnElement="Flow_1oy6uax">
+        <di:waypoint x="700" y="300" />
+        <di:waypoint x="820" y="300" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="722" y="282" width="76" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

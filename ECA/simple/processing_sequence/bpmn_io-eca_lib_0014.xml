@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:qa="http://some-company/schema/bpmn/qa" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:process id="eca_lib_0014" name="Processing sequence" isExecutable="true" camunda:versionTag="v1">
+    <bpmn2:documentation>This model comes with 2 processes, that look similar but do behave differently. They get executed by calling `drush eca:trigger:custom_event procorder` on the console of the Drupal site.
+
+What the 2 processes do is to set a token value, then overwrite that token with a different value and finally print the value out on screen as a message. However, that's what we expect but not what we get. For the first process (the left one), that's what we get. But the second one seems to have a mistake: it doesn't print 12, instead we get the value 5.
+
+This is because the processing order of succeeding actions is not necessarily what we see on screen - where both processes look the same. Instead, the order depends on the order in which the successors got added to the predecessor. The problem being present is, that BPMN, while it relies on that order, doesn't have any form of indicator that would help us to see that in the visual model.
+
+We have recorded a video which discusses that topic alongside this model and demonstrates how to find out about the order os successors. It then also shows how to fix the order in case it got messed up. You can find that by [following this link](https://tube.tchncs.de/w/a92s9649VVKuMdoXZHbLDq?start=12m45s).</bpmn2:documentation>
+    <bpmn2:extensionElements>
+      <camunda:properties>
+        <camunda:property name="Tags" value="simple,successors,processing order"/>
+        <camunda:property name="Changelog v1" value="Initial version"/>
+      </camunda:properties>
+    </bpmn2:extensionElements>
+    <bpmn2:startEvent id="Event_0t2yl7h" name="Custom event: procorder" camunda:modelerTemplate="org.drupal.event.eca_base:eca_custom">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_base:eca_custom"/>
+        </camunda:properties>
+        <camunda:field name="event_id">
+          <camunda:string>procorder</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_1yee4l0</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_1oj8gej" name="Set token to 1" camunda:modelerTemplate="org.drupal.action.eca_token_set_value">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_token_set_value"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>myvalue</camunda:string>
+        </camunda:field>
+        <camunda:field name="token_value">
+          <camunda:string>1</camunda:string>
+        </camunda:field>
+        <camunda:field name="use_yaml">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1yee4l0</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1fzhg9e</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_02kzov1</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1yee4l0" sourceRef="Event_0t2yl7h" targetRef="Activity_1oj8gej"/>
+    <bpmn2:task id="Activity_0x86t8v" name="Overwrite token value to 2" camunda:modelerTemplate="org.drupal.action.eca_token_set_value">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_token_set_value"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>myvalue</camunda:string>
+        </camunda:field>
+        <camunda:field name="token_value">
+          <camunda:string>2</camunda:string>
+        </camunda:field>
+        <camunda:field name="use_yaml">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1fzhg9e</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1fzhg9e" sourceRef="Activity_1oj8gej" targetRef="Activity_0x86t8v"/>
+    <bpmn2:task id="Activity_1qferse" name="Print message with value" camunda:modelerTemplate="org.drupal.action.action_message_action">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="action_message_action"/>
+        </camunda:properties>
+        <camunda:field name="message">
+          <camunda:string>The value is [myvalue]</camunda:string>
+        </camunda:field>
+        <camunda:field name="replace_tokens">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_02kzov1</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_02kzov1" sourceRef="Activity_1oj8gej" targetRef="Activity_1qferse"/>
+    <bpmn2:startEvent id="Event_1fon7nn" name="Custom event: procorder" camunda:modelerTemplate="org.drupal.event.eca_base:eca_custom">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_base:eca_custom"/>
+        </camunda:properties>
+        <camunda:field name="event_id">
+          <camunda:string>procorder</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_0wguael</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_15idgk3" name="Set token to 5" camunda:modelerTemplate="org.drupal.action.eca_token_set_value">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_token_set_value"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>myothervalue</camunda:string>
+        </camunda:field>
+        <camunda:field name="token_value">
+          <camunda:string>5</camunda:string>
+        </camunda:field>
+        <camunda:field name="use_yaml">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0wguael</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1hqie36</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_1smtm07</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0wguael" sourceRef="Event_1fon7nn" targetRef="Activity_15idgk3"/>
+    <bpmn2:task id="Activity_11cs5hn" name="Print message with value" camunda:modelerTemplate="org.drupal.action.action_message_action">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="action_message_action"/>
+        </camunda:properties>
+        <camunda:field name="message">
+          <camunda:string>The second value is [myothervalue]</camunda:string>
+        </camunda:field>
+        <camunda:field name="replace_tokens">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1hqie36</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:task id="Activity_0ta0n8l" name="Overwrite token value to 12" camunda:modelerTemplate="org.drupal.action.eca_token_set_value">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_token_set_value"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>myothervalue</camunda:string>
+        </camunda:field>
+        <camunda:field name="token_value">
+          <camunda:string>12</camunda:string>
+        </camunda:field>
+        <camunda:field name="use_yaml">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1smtm07</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1hqie36" sourceRef="Activity_15idgk3" targetRef="Activity_11cs5hn"/>
+    <bpmn2:sequenceFlow id="Flow_1smtm07" sourceRef="Activity_15idgk3" targetRef="Activity_0ta0n8l"/>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="sid-33bb3423-e52e-47c2-95e1-6b7d4a2d5d38">
+    <bpmndi:BPMNPlane id="sid-3d794d30-f9f4-4cf4-8ddd-86671cd866ef" bpmnElement="eca_lib_0014">
+      <bpmndi:BPMNShape id="Event_0t2yl7h_di" bpmnElement="Event_0t2yl7h">
+        <dc:Bounds x="182" y="72" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="165" y="115" width="71" height="27"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1oj8gej_di" bpmnElement="Activity_1oj8gej">
+        <dc:Bounds x="270" y="50" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0x86t8v_di" bpmnElement="Activity_0x86t8v">
+        <dc:Bounds x="430" y="50" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1qferse_di" bpmnElement="Activity_1qferse">
+        <dc:Bounds x="430" y="160" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1fon7nn_di" bpmnElement="Event_1fon7nn">
+        <dc:Bounds x="652" y="72" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="635" y="115" width="71" height="27"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_15idgk3_di" bpmnElement="Activity_15idgk3">
+        <dc:Bounds x="740" y="50" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_11cs5hn_di" bpmnElement="Activity_11cs5hn">
+        <dc:Bounds x="900" y="160" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ta0n8l_di" bpmnElement="Activity_0ta0n8l">
+        <dc:Bounds x="900" y="50" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1yee4l0_di" bpmnElement="Flow_1yee4l0">
+        <di:waypoint x="218" y="90"/>
+        <di:waypoint x="270" y="90"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1fzhg9e_di" bpmnElement="Flow_1fzhg9e">
+        <di:waypoint x="370" y="90"/>
+        <di:waypoint x="430" y="90"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_02kzov1_di" bpmnElement="Flow_02kzov1">
+        <di:waypoint x="370" y="90"/>
+        <di:waypoint x="400" y="90"/>
+        <di:waypoint x="400" y="200"/>
+        <di:waypoint x="430" y="200"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0wguael_di" bpmnElement="Flow_0wguael">
+        <di:waypoint x="688" y="90"/>
+        <di:waypoint x="740" y="90"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1hqie36_di" bpmnElement="Flow_1hqie36">
+        <di:waypoint x="840" y="90"/>
+        <di:waypoint x="870" y="90"/>
+        <di:waypoint x="870" y="200"/>
+        <di:waypoint x="900" y="200"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1smtm07_di" bpmnElement="Flow_1smtm07">
+        <di:waypoint x="840" y="90"/>
+        <di:waypoint x="900" y="90"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

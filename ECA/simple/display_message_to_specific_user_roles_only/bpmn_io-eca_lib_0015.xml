@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:qa="http://some-company/schema/bpmn/qa" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:process id="eca_lib_0015" name="Display message to specific user roles only" isExecutable="true" camunda:versionTag="v1">
+    <bpmn2:documentation>This model prints a message on screen, when the user opens the user profile form for editing. The message output is limited to users that have one of the roles editor, customer or auditor.</bpmn2:documentation>
+    <bpmn2:extensionElements>
+      <camunda:properties>
+        <camunda:property name="Tags" value="simple,message,condition"/>
+        <camunda:property name="Changelog v1" value="Initial version"/>
+      </camunda:properties>
+    </bpmn2:extensionElements>
+    <bpmn2:startEvent id="Event_0be6br5" name="Build user profile form" camunda:modelerTemplate="org.drupal.event.form:form_build">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="form:form_build"/>
+        </camunda:properties>
+        <camunda:field name="form_id">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="entity_type_id">
+          <camunda:string>user</camunda:string>
+        </camunda:field>
+        <camunda:field name="bundle">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="operation">
+          <camunda:string>default, edit</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_0wvpaa1</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_03olz9x</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_1oa4lhn</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_0lnxseo" name="Display message" camunda:modelerTemplate="org.drupal.action.action_message_action">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="action_message_action"/>
+        </camunda:properties>
+        <camunda:field name="message">
+          <camunda:string>Please be careful with making changes here.</camunda:string>
+        </camunda:field>
+        <camunda:field name="replace_tokens">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0wvpaa1</bpmn2:incoming>
+      <bpmn2:incoming>Flow_03olz9x</bpmn2:incoming>
+      <bpmn2:incoming>Flow_1oa4lhn</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0wvpaa1" name="role = editor?" camunda:modelerTemplate="org.drupal.condition.eca_current_user_role" sourceRef="Event_0be6br5" targetRef="Activity_0lnxseo">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_current_user_role"/>
+        </camunda:properties>
+        <camunda:field name="role">
+          <camunda:string>content_editor</camunda:string>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="Flow_03olz9x" name="role = customer?" camunda:modelerTemplate="org.drupal.condition.eca_current_user_role" sourceRef="Event_0be6br5" targetRef="Activity_0lnxseo">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_current_user_role"/>
+        </camunda:properties>
+        <camunda:field name="role">
+          <camunda:string>customer</camunda:string>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="Flow_1oa4lhn" name="role = auditor?" camunda:modelerTemplate="org.drupal.condition.eca_current_user_role" sourceRef="Event_0be6br5" targetRef="Activity_0lnxseo">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_current_user_role"/>
+        </camunda:properties>
+        <camunda:field name="role">
+          <camunda:string>auditor</camunda:string>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="sid-c010b3bf-d2c0-46b7-a2cd-7e7feb8d0950">
+    <bpmndi:BPMNPlane id="sid-f0e6657a-36cb-401e-ae23-3fa87118d67f" bpmnElement="eca_lib_0015">
+      <bpmndi:BPMNShape id="Event_0be6br5_di" bpmnElement="Event_0be6br5">
+        <dc:Bounds x="362" y="182" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="342" y="225" width="82" height="27"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0lnxseo_di" bpmnElement="Activity_0lnxseo">
+        <dc:Bounds x="630" y="160" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0wvpaa1_di" bpmnElement="Flow_0wvpaa1">
+        <di:waypoint x="380" y="182"/>
+        <di:waypoint x="380" y="30"/>
+        <di:waypoint x="680" y="30"/>
+        <di:waypoint x="680" y="160"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="499" y="13" width="65" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_03olz9x_di" bpmnElement="Flow_03olz9x">
+        <di:waypoint x="380" y="182"/>
+        <di:waypoint x="380" y="70"/>
+        <di:waypoint x="680" y="70"/>
+        <di:waypoint x="680" y="160"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="490" y="52" width="83" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1oa4lhn_di" bpmnElement="Flow_1oa4lhn">
+        <di:waypoint x="380" y="182"/>
+        <di:waypoint x="380" y="110"/>
+        <di:waypoint x="680" y="110"/>
+        <di:waypoint x="680" y="160"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="495" y="92" width="71" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

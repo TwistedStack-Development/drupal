@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:qa="http://some-company/schema/bpmn/qa" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:process id="ECA_Lib_0003" name="Redirect unpublished" isExecutable="true" camunda:versionTag="v1">
+    <bpmn2:documentation>If a user requests an unpublished article node, but doesn't have the permission to view unpublished nodes, then the request gets redirected to the contact form.</bpmn2:documentation>
+    <bpmn2:extensionElements>
+      <camunda:properties>
+        <camunda:property name="Tags" value="use case, redirect"/>
+        <camunda:property name="Changelog v1" value="Initial version"/>
+      </camunda:properties>
+    </bpmn2:extensionElements>
+    <bpmn2:startEvent id="Event_0l86rxh" name="Start request" camunda:modelerTemplate="org.drupal.event.kernel:request">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="kernel:request"/>
+        </camunda:properties>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_1xa65m3</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_0yxnsha" name="Add node from route to token" camunda:modelerTemplate="org.drupal.action.eca_token_load_route_param">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_token_load_route_param"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>mynode</camunda:string>
+        </camunda:field>
+        <camunda:field name="request">
+          <camunda:string>0</camunda:string>
+        </camunda:field>
+        <camunda:field name="parameter_name">
+          <camunda:string>node</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0vgujvv</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_057atra</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0vgujvv" name="Is it a node request?" camunda:modelerTemplate="org.drupal.condition.eca_route_match" sourceRef="Activity_1k7t4h4" targetRef="Activity_0yxnsha">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_route_match"/>
+        </camunda:properties>
+        <camunda:field name="operator">
+          <camunda:string>equal</camunda:string>
+        </camunda:field>
+        <camunda:field name="request">
+          <camunda:string>0</camunda:string>
+        </camunda:field>
+        <camunda:field name="route">
+          <camunda:string>entity.node.canonical</camunda:string>
+        </camunda:field>
+        <camunda:field name="type">
+          <camunda:string>value</camunda:string>
+        </camunda:field>
+        <camunda:field name="case">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:task id="Activity_1bcku98" name="Print node title as message" camunda:modelerTemplate="org.drupal.action.action_message_action">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="action_message_action"/>
+        </camunda:properties>
+        <camunda:field name="message">
+          <camunda:string>You are visiting "[mynode:title]"</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_057atra</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1wyatbm</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_057atra" name="Is article?" camunda:modelerTemplate="org.drupal.condition.eca_entity_type_bundle" sourceRef="Activity_0yxnsha" targetRef="Activity_1bcku98">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_entity_type_bundle"/>
+        </camunda:properties>
+        <camunda:field name="type">
+          <camunda:string>node article</camunda:string>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="entity">
+          <camunda:string>mynode</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:task id="Activity_1e9brxq" name="Redirect" camunda:modelerTemplate="org.drupal.action.action_goto_action">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="action_goto_action"/>
+        </camunda:properties>
+        <camunda:field name="url">
+          <camunda:string>/contact</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1wyatbm</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1wyatbm" name="Unpublished?" camunda:modelerTemplate="org.drupal.condition.eca_entity_field_value" sourceRef="Activity_1bcku98" targetRef="Activity_1e9brxq">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_entity_field_value"/>
+        </camunda:properties>
+        <camunda:field name="field_name">
+          <camunda:string>status</camunda:string>
+        </camunda:field>
+        <camunda:field name="operator">
+          <camunda:string>equal</camunda:string>
+        </camunda:field>
+        <camunda:field name="expected_value">
+          <camunda:string>0</camunda:string>
+        </camunda:field>
+        <camunda:field name="type">
+          <camunda:string>value</camunda:string>
+        </camunda:field>
+        <camunda:field name="case">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="entity">
+          <camunda:string>mynode</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:task id="Activity_1k7t4h4" name="Switch User" camunda:modelerTemplate="org.drupal.action.eca_switch_account">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_switch_account"/>
+        </camunda:properties>
+        <camunda:field name="user_id">
+          <camunda:string>1</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1xa65m3</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0vgujvv</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1xa65m3" name="May not view unpublished content?" camunda:modelerTemplate="org.drupal.condition.eca_current_user_permission" sourceRef="Event_0l86rxh" targetRef="Activity_1k7t4h4">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_current_user_permission"/>
+        </camunda:properties>
+        <camunda:field name="permission">
+          <camunda:string>view own unpublished content</camunda:string>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="sid-c4cc2aba-38be-41bc-9c9c-1bd2c06a402f">
+    <bpmndi:BPMNPlane id="sid-82cbdb3a-43a7-4a22-8b63-5aa1fb0fc600" bpmnElement="ECA_Lib_0003">
+      <bpmndi:BPMNShape id="Event_0l86rxh_di" bpmnElement="Event_0l86rxh">
+        <dc:Bounds x="282" y="112" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="269" y="155" width="63" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0yxnsha_di" bpmnElement="Activity_0yxnsha">
+        <dc:Bounds x="680" y="90" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1bcku98_di" bpmnElement="Activity_1bcku98">
+        <dc:Bounds x="900" y="90" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1e9brxq_di" bpmnElement="Activity_1e9brxq">
+        <dc:Bounds x="1090" y="90" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1k7t4h4_di" bpmnElement="Activity_1k7t4h4">
+        <dc:Bounds x="449" y="90" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0vgujvv_di" bpmnElement="Flow_0vgujvv">
+        <di:waypoint x="549" y="130"/>
+        <di:waypoint x="680" y="130"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="580" y="96" width="54" height="27"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_057atra_di" bpmnElement="Flow_057atra">
+        <di:waypoint x="780" y="130"/>
+        <di:waypoint x="900" y="130"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="819" y="112" width="48" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1wyatbm_di" bpmnElement="Flow_1wyatbm">
+        <di:waypoint x="1000" y="130"/>
+        <di:waypoint x="1090" y="130"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1011" y="112" width="68" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1xa65m3_di" bpmnElement="Flow_1xa65m3">
+        <di:waypoint x="318" y="130"/>
+        <di:waypoint x="449" y="130"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="351" y="90" width="65" height="40"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:qa="http://some-company/schema/bpmn/qa" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:process id="eca_lib_0016" name="Asynchronous views export" isExecutable="true" camunda:versionTag="v1">
+    <bpmn2:documentation>This model provides an endpoint `/eca/export/users` which can be published as a menu item or a link. When requested, it does this:
+
+- Check access and only allow users with the administror role to cal that endpoint
+- Enqueue a task called `export-users` and forward the email address of the current user
+- Display a message to the user and redirect them back to the page where they came from
+
+After that, the task is being queued and will be executed by the next cron of the Drupal site. This will then execute the view and export the result into a csv file. Finally, an email will be sent to the user who originally requested the export together with the link from where they can download the export.
+
+Building this model has been recorded: [watch video](https://tube.tchncs.de/w/qpc4qAu2jPMPqcnzV8125h)</bpmn2:documentation>
+    <bpmn2:extensionElements>
+      <camunda:properties>
+        <camunda:property name="Tags" value="simple,views,export,endpoint,queue"/>
+        <camunda:property name="Changelog v1" value="Initial version"/>
+      </camunda:properties>
+    </bpmn2:extensionElements>
+    <bpmn2:startEvent id="Event_0upnk7p" name="Endpoint response event" camunda:modelerTemplate="org.drupal.event.eca_endpoint:response">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_endpoint:response"/>
+        </camunda:properties>
+        <camunda:field name="first_path_argument">
+          <camunda:string>export</camunda:string>
+        </camunda:field>
+        <camunda:field name="second_path_argument">
+          <camunda:string>users</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_1830882</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_077y9bb" name="Get user's email address" camunda:modelerTemplate="org.drupal.action.eca_token_set_value">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_token_set_value"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>email</camunda:string>
+        </camunda:field>
+        <camunda:field name="token_value">
+          <camunda:string>[current_user:mail:value]</camunda:string>
+        </camunda:field>
+        <camunda:field name="use_yaml">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1830882</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1czmpnn</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1830882" sourceRef="Event_0upnk7p" targetRef="Activity_077y9bb"/>
+    <bpmn2:task id="Activity_0udkfuk" name="Enqueue the export task" camunda:modelerTemplate="org.drupal.action.eca_enqueue_task">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_enqueue_task"/>
+        </camunda:properties>
+        <camunda:field name="task_name">
+          <camunda:string>export-users</camunda:string>
+        </camunda:field>
+        <camunda:field name="task_value">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="tokens">
+          <camunda:string>email</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1czmpnn</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1uewb92</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1czmpnn" sourceRef="Activity_077y9bb" targetRef="Activity_0udkfuk"/>
+    <bpmn2:task id="Activity_00rb6ol" name="Print message" camunda:modelerTemplate="org.drupal.action.action_message_action">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="action_message_action"/>
+        </camunda:properties>
+        <camunda:field name="message">
+          <camunda:string>Your request for the user export has been received. We will notify you by email ([email]) once it's ready for download.</camunda:string>
+        </camunda:field>
+        <camunda:field name="replace_tokens">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1uewb92</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0w66wzy</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1uewb92" sourceRef="Activity_0udkfuk" targetRef="Activity_00rb6ol"/>
+    <bpmn2:task id="Activity_0ebf5c5" name="Get the referrer URL" camunda:modelerTemplate="org.drupal.action.eca_endpoint_get_request_header">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_endpoint_get_request_header"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>referer</camunda:string>
+        </camunda:field>
+        <camunda:field name="name">
+          <camunda:string>referer</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0w66wzy</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_18grueb</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0w66wzy" sourceRef="Activity_00rb6ol" targetRef="Activity_0ebf5c5"/>
+    <bpmn2:task id="Activity_1mwsdsv" name="Redirect the user" camunda:modelerTemplate="org.drupal.action.action_goto_action">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="action_goto_action"/>
+        </camunda:properties>
+        <camunda:field name="url">
+          <camunda:string>[referer]</camunda:string>
+        </camunda:field>
+        <camunda:field name="replace_tokens">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_18grueb</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_18grueb" sourceRef="Activity_0ebf5c5" targetRef="Activity_1mwsdsv"/>
+    <bpmn2:startEvent id="Event_079c3t3" name="Verify access to the endpoint" camunda:modelerTemplate="org.drupal.event.eca_endpoint:access">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_endpoint:access"/>
+        </camunda:properties>
+        <camunda:field name="first_path_argument">
+          <camunda:string>export</camunda:string>
+        </camunda:field>
+        <camunda:field name="second_path_argument">
+          <camunda:string>users</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_1qwm7o2</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_03czabg" name="Allow access" camunda:modelerTemplate="org.drupal.action.eca_access_set_result">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_access_set_result"/>
+        </camunda:properties>
+        <camunda:field name="access_result">
+          <camunda:string>allowed</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1qwm7o2</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1qwm7o2" name="is admin?" camunda:modelerTemplate="org.drupal.condition.eca_current_user_role" sourceRef="Event_079c3t3" targetRef="Activity_03czabg">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_current_user_role"/>
+        </camunda:properties>
+        <camunda:field name="role">
+          <camunda:string>administrator</camunda:string>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:startEvent id="Event_0k7tmxh" name="Process task export-users" camunda:modelerTemplate="org.drupal.event.eca_queue:processing_task">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_queue:processing_task"/>
+        </camunda:properties>
+        <camunda:field name="task_name">
+          <camunda:string>export-users</camunda:string>
+        </camunda:field>
+        <camunda:field name="task_value">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="distribute">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="cron">
+          <camunda:string/>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_1vhshhg</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_0lbjb7k" name="Run export" camunda:modelerTemplate="org.drupal.action.eca_views_export">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_views_export"/>
+        </camunda:properties>
+        <camunda:field name="load_results_into_token">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="token_name">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="view_id">
+          <camunda:string>user_admin_people</camunda:string>
+        </camunda:field>
+        <camunda:field name="display_id">
+          <camunda:string>data_export_1</camunda:string>
+        </camunda:field>
+        <camunda:field name="arguments">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="token_for_filename">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="filename">
+          <camunda:string>private://user-export.csv</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0nkpjhl</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1p088d5</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1vhshhg" sourceRef="Event_0k7tmxh" targetRef="Activity_13dr0m3"/>
+    <bpmn2:task id="Activity_0kl7hjm" name="Send email" camunda:modelerTemplate="org.drupal.action.action_send_email_action">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="action_send_email_action"/>
+        </camunda:properties>
+        <camunda:field name="recipient">
+          <camunda:string>[email]</camunda:string>
+        </camunda:field>
+        <camunda:field name="subject">
+          <camunda:string>Your export is available for download</camunda:string>
+        </camunda:field>
+        <camunda:field name="message">
+          <camunda:string>You can find it here: [site:url]sites/default/private/user-export.csv</camunda:string>
+        </camunda:field>
+        <camunda:field name="replace_tokens">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1p088d5</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1p088d5" sourceRef="Activity_0lbjb7k" targetRef="Activity_0kl7hjm"/>
+    <bpmn2:task id="Activity_13dr0m3" name="Switch user" camunda:modelerTemplate="org.drupal.action.eca_switch_account">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_switch_account"/>
+        </camunda:properties>
+        <camunda:field name="user_id">
+          <camunda:string>1</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1vhshhg</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0nkpjhl</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0nkpjhl" sourceRef="Activity_13dr0m3" targetRef="Activity_0lbjb7k"/>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="sid-fa53906d-c46e-4756-b923-ce3a6554cd0d">
+    <bpmndi:BPMNPlane id="sid-c61c351f-1564-4cce-8b6c-5dce9ce1c3d8" bpmnElement="eca_lib_0016">
+      <bpmndi:BPMNShape id="Event_0upnk7p_di" bpmnElement="Event_0upnk7p">
+        <dc:Bounds x="252" y="82" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="233" y="125" width="76" height="27"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_077y9bb_di" bpmnElement="Activity_077y9bb">
+        <dc:Bounds x="340" y="60" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0udkfuk_di" bpmnElement="Activity_0udkfuk">
+        <dc:Bounds x="500" y="60" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_00rb6ol_di" bpmnElement="Activity_00rb6ol">
+        <dc:Bounds x="660" y="60" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ebf5c5_di" bpmnElement="Activity_0ebf5c5">
+        <dc:Bounds x="820" y="60" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1mwsdsv_di" bpmnElement="Activity_1mwsdsv">
+        <dc:Bounds x="980" y="60" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_079c3t3_di" bpmnElement="Event_079c3t3">
+        <dc:Bounds x="252" y="202" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="232" y="245" width="78" height="27"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_03czabg_di" bpmnElement="Activity_03czabg">
+        <dc:Bounds x="340" y="180" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0k7tmxh_di" bpmnElement="Event_0k7tmxh">
+        <dc:Bounds x="252" y="342" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="239" y="385" width="63" height="27"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0lbjb7k_di" bpmnElement="Activity_0lbjb7k">
+        <dc:Bounds x="500" y="320" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0kl7hjm_di" bpmnElement="Activity_0kl7hjm">
+        <dc:Bounds x="660" y="320" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_13dr0m3_di" bpmnElement="Activity_13dr0m3">
+        <dc:Bounds x="340" y="320" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1830882_di" bpmnElement="Flow_1830882">
+        <di:waypoint x="288" y="100"/>
+        <di:waypoint x="340" y="100"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1czmpnn_di" bpmnElement="Flow_1czmpnn">
+        <di:waypoint x="440" y="100"/>
+        <di:waypoint x="500" y="100"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1uewb92_di" bpmnElement="Flow_1uewb92">
+        <di:waypoint x="600" y="100"/>
+        <di:waypoint x="660" y="100"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0w66wzy_di" bpmnElement="Flow_0w66wzy">
+        <di:waypoint x="760" y="100"/>
+        <di:waypoint x="820" y="100"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_18grueb_di" bpmnElement="Flow_18grueb">
+        <di:waypoint x="920" y="100"/>
+        <di:waypoint x="980" y="100"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1qwm7o2_di" bpmnElement="Flow_1qwm7o2">
+        <di:waypoint x="288" y="220"/>
+        <di:waypoint x="340" y="220"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="291" y="202" width="48" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1vhshhg_di" bpmnElement="Flow_1vhshhg">
+        <di:waypoint x="288" y="360"/>
+        <di:waypoint x="340" y="360"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1p088d5_di" bpmnElement="Flow_1p088d5">
+        <di:waypoint x="600" y="360"/>
+        <di:waypoint x="660" y="360"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0nkpjhl_di" bpmnElement="Flow_0nkpjhl">
+        <di:waypoint x="440" y="360"/>
+        <di:waypoint x="500" y="360"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

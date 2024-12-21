@@ -1,0 +1,7 @@
+config:
+  - eca.eca.eca_lib_0008
+  - eca.model.eca_lib_0008
+module:
+  - eca_base
+  - eca_misc
+  - eca_user

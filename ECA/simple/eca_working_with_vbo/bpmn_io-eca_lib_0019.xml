@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:qa="http://some-company/schema/bpmn/qa" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:process id="eca_lib_0019" name="ECA working with VBO" isExecutable="true" camunda:versionTag="v1">
+    <bpmn2:documentation>This model shows how you get Drupal views working with VBO and ECA together. The creation of this model was [recorded in a video](https://tube.tchncs.de/w/vNRrQDcmEA2QbW771acZZi) and explains a lot more detail there.</bpmn2:documentation>
+    <bpmn2:extensionElements>
+      <camunda:properties>
+        <camunda:property name="Changelog v1" value="Initial version"/>
+        <camunda:property name="Tags" value="simple,vbo,views"/>
+      </camunda:properties>
+    </bpmn2:extensionElements>
+    <bpmn2:startEvent id="Event_064fxfo" name="VBO" camunda:modelerTemplate="org.drupal.event.vbo:execute">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="vbo:execute"/>
+        </camunda:properties>
+        <camunda:field name="operation_name">
+          <camunda:string>Print title of nodes</camunda:string>
+        </camunda:field>
+        <camunda:field name="view_id">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="display_id">
+          <camunda:string/>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_1vujk05</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_1kqu259" name="Message" camunda:modelerTemplate="org.drupal.action.action_message_action">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="action_message_action"/>
+        </camunda:properties>
+        <camunda:field name="message">
+          <camunda:string>You have selected the node with title "[event:entity:label]"</camunda:string>
+        </camunda:field>
+        <camunda:field name="replace_tokens">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1vujk05</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1vujk05" sourceRef="Event_064fxfo" targetRef="Activity_1kqu259"/>
+    <bpmn2:startEvent id="Event_1aykdtv" name="VBO access" camunda:modelerTemplate="org.drupal.event.vbo:custom_access">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="vbo:custom_access"/>
+        </camunda:properties>
+        <camunda:field name="operation_name">
+          <camunda:string>Print title of nodes</camunda:string>
+        </camunda:field>
+        <camunda:field name="view_id">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="display_id">
+          <camunda:string/>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_0uq6dlc</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_01ysx5f" name="yes" camunda:modelerTemplate="org.drupal.action.eca_vbo_set_custom_access">
+      <bpmn2:extensionElements>
+        <camunda:field name="access_granted">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_vbo_set_custom_access"/>
+        </camunda:properties>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0uq6dlc</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0uq6dlc" sourceRef="Event_1aykdtv" targetRef="Activity_01ysx5f"/>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="sid-7032d03b-00d2-4928-8af5-40323621fa9f">
+    <bpmndi:BPMNPlane id="sid-0ef18a24-321c-41e5-be61-b31e451fd1b5" bpmnElement="eca_lib_0019">
+      <bpmndi:BPMNShape id="Event_064fxfo_di" bpmnElement="Event_064fxfo">
+        <dc:Bounds x="352" y="92" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="359" y="135" width="24" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1kqu259_di" bpmnElement="Activity_1kqu259">
+        <dc:Bounds x="440" y="70" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1aykdtv_di" bpmnElement="Event_1aykdtv">
+        <dc:Bounds x="682" y="92" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="671" y="135" width="61" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_01ysx5f_di" bpmnElement="Activity_01ysx5f">
+        <dc:Bounds x="770" y="70" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1vujk05_di" bpmnElement="Flow_1vujk05">
+        <di:waypoint x="388" y="110"/>
+        <di:waypoint x="440" y="110"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0uq6dlc_di" bpmnElement="Flow_0uq6dlc">
+        <di:waypoint x="718" y="110"/>
+        <di:waypoint x="770" y="110"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:qa="http://some-company/schema/bpmn/qa" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:process id="eca_lib_0025" name="Send email on user registration with field values" isExecutable="true" camunda:versionTag="v1">
+    <bpmn2:documentation>This model sends an email to a user that has just registered on the site. That email contains field values, that the user just provided in the registration form, where one of the fields is mandatory and the other one is optional. The email message is different, depending upon the optional field being filled or not.
+
+The creation of this model was recorded and [can be watched here](https://tube.tchncs.de/w/7oZPDv2fWfg3fpHENjCqpK).</bpmn2:documentation>
+    <bpmn2:extensionElements>
+      <camunda:properties>
+        <camunda:property name="Changelog v1" value="Initial release"/>
+        <camunda:property name="Tags" value="simple,registration,email,field tokens,conditions"/>
+      </camunda:properties>
+    </bpmn2:extensionElements>
+    <bpmn2:startEvent id="Event_08y3jg5" name="User registration" camunda:modelerTemplate="org.drupal.event.content_entity:insert">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="content_entity:insert"/>
+        </camunda:properties>
+        <camunda:field name="type">
+          <camunda:string>user user</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_1rlu1x6</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_1c129wl" name="Send email" camunda:modelerTemplate="org.drupal.action.action_send_email_action">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="action_send_email_action"/>
+        </camunda:properties>
+        <camunda:field name="recipient">
+          <camunda:string>[entity:mail]</camunda:string>
+        </camunda:field>
+        <camunda:field name="subject">
+          <camunda:string>Thanks for your registration at [site:name] @[entity:name]</camunda:string>
+        </camunda:field>
+        <camunda:field name="message">
+          <camunda:string>Hi [entity:name],
+
+Thanks for your registration.
+
+[message]
+
+Sincerely yours
+ECA</camunda:string>
+        </camunda:field>
+        <camunda:field name="replace_tokens">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0jjcjjr</bpmn2:incoming>
+      <bpmn2:incoming>Flow_1xunqy2</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:task id="Activity_1esjcw4" name="Build message" camunda:modelerTemplate="org.drupal.action.eca_token_set_value">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_token_set_value"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>message</camunda:string>
+        </camunda:field>
+        <camunda:field name="token_value">
+          <camunda:string>Is it correct, that your home town is [entity:field_home_town]?
+
+If not, please let us know.</camunda:string>
+        </camunda:field>
+        <camunda:field name="use_yaml">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1rlu1x6</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0ppkyo0</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_1xunqy2</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1rlu1x6" sourceRef="Event_08y3jg5" targetRef="Activity_1esjcw4"/>
+    <bpmn2:task id="Activity_1kfdaq5" name="Append country" camunda:modelerTemplate="org.drupal.action.eca_token_set_value">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_token_set_value"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>message</camunda:string>
+        </camunda:field>
+        <camunda:field name="token_value">
+          <camunda:string>[message]
+
+Is that hometown really in [entity:field_country]?</camunda:string>
+        </camunda:field>
+        <camunda:field name="use_yaml">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0ppkyo0</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0jjcjjr</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0ppkyo0" name="is country given?" camunda:modelerTemplate="org.drupal.condition.eca_entity_field_value_empty" sourceRef="Activity_1esjcw4" targetRef="Activity_1kfdaq5">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_entity_field_value_empty"/>
+        </camunda:properties>
+        <camunda:field name="field_name">
+          <camunda:string>field_country</camunda:string>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+        <camunda:field name="entity">
+          <camunda:string/>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="Flow_0jjcjjr" sourceRef="Activity_1kfdaq5" targetRef="Activity_1c129wl"/>
+    <bpmn2:sequenceFlow id="Flow_1xunqy2" name="is country empty?" camunda:modelerTemplate="org.drupal.condition.eca_entity_field_value_empty" sourceRef="Activity_1esjcw4" targetRef="Activity_1c129wl">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_entity_field_value_empty"/>
+        </camunda:properties>
+        <camunda:field name="field_name">
+          <camunda:string>field_country</camunda:string>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="entity">
+          <camunda:string/>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="sid-81820d80-9232-437d-a86d-1fc53ace1ef2">
+    <bpmndi:BPMNPlane id="sid-76cdd05b-1c31-4308-8a36-26d7727045d2" bpmnElement="eca_lib_0025">
+      <bpmndi:BPMNShape id="Event_08y3jg5_di" bpmnElement="Event_08y3jg5">
+        <dc:Bounds x="492" y="112" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="470" y="155" width="81" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1c129wl_di" bpmnElement="Activity_1c129wl">
+        <dc:Bounds x="1090" y="90" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1esjcw4_di" bpmnElement="Activity_1esjcw4">
+        <dc:Bounds x="580" y="90" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1kfdaq5_di" bpmnElement="Activity_1kfdaq5">
+        <dc:Bounds x="850" y="90" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1rlu1x6_di" bpmnElement="Flow_1rlu1x6">
+        <di:waypoint x="528" y="130"/>
+        <di:waypoint x="580" y="130"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ppkyo0_di" bpmnElement="Flow_0ppkyo0">
+        <di:waypoint x="680" y="130"/>
+        <di:waypoint x="850" y="130"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="731" y="112" width="83" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0jjcjjr_di" bpmnElement="Flow_0jjcjjr">
+        <di:waypoint x="950" y="130"/>
+        <di:waypoint x="1090" y="130"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1xunqy2_di" bpmnElement="Flow_1xunqy2">
+        <di:waypoint x="630" y="170"/>
+        <di:waypoint x="630" y="260"/>
+        <di:waypoint x="1140" y="260"/>
+        <di:waypoint x="1140" y="170"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="842" y="242" width="87" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

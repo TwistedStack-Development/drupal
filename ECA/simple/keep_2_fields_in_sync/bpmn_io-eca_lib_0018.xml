@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:qa="http://some-company/schema/bpmn/qa" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:process id="eca_lib_0018" name="Keep 2 fields in sync" isExecutable="true" camunda:versionTag="v1">
+    <bpmn2:documentation>This model demonstrates how a text field in a user entity can be kept in sync with a similar field in an associated profile entity. This works in both directions. Regardless which of the entities gets updated, the other one will be updated automatically as well.
+
+Without paying attention, this could lead into an infinite loop. Therefore, the related entity only gets updated if the field values are not the same already.
+
+The creation of that model has been recorded: [Watch the video](https://tube.tchncs.de/w/99udnEHSUb5V7Dj66zes59)</bpmn2:documentation>
+    <bpmn2:extensionElements>
+      <camunda:properties>
+        <camunda:property name="Changelog v1" value="Initial version"/>
+        <camunda:property name="Tags" value="simple,recursion,field updates"/>
+      </camunda:properties>
+    </bpmn2:extensionElements>
+    <bpmn2:startEvent id="Event_16r9kcr" name="Update user" camunda:modelerTemplate="org.drupal.event.content_entity:update">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="content_entity:update"/>
+        </camunda:properties>
+        <camunda:field name="type">
+          <camunda:string>user _all</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_1czyt6b</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_11sqti4" name="Load profile entity" camunda:modelerTemplate="org.drupal.action.eca_token_load_entity">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_token_load_entity"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>profile</camunda:string>
+        </camunda:field>
+        <camunda:field name="from">
+          <camunda:string>id</camunda:string>
+        </camunda:field>
+        <camunda:field name="entity_type">
+          <camunda:string>profile</camunda:string>
+        </camunda:field>
+        <camunda:field name="entity_id">
+          <camunda:string>[user:contact_detail:profile_id]</camunda:string>
+        </camunda:field>
+        <camunda:field name="revision_id">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="langcode">
+          <camunda:string>_interface</camunda:string>
+        </camunda:field>
+        <camunda:field name="latest_revision">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="unchanged">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="properties">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="object">
+          <camunda:string/>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1czyt6b</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_04llbyd</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_1czyt6b" name="Profile exists?" camunda:modelerTemplate="org.drupal.condition.eca_scalar" sourceRef="Event_16r9kcr" targetRef="Activity_11sqti4">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_scalar"/>
+        </camunda:properties>
+        <camunda:field name="left">
+          <camunda:string>[user:contact_detail:profile_id]</camunda:string>
+        </camunda:field>
+        <camunda:field name="operator">
+          <camunda:string>equal</camunda:string>
+        </camunda:field>
+        <camunda:field name="right">
+          <camunda:string/>
+        </camunda:field>
+        <camunda:field name="type">
+          <camunda:string>value</camunda:string>
+        </camunda:field>
+        <camunda:field name="case">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:task id="Activity_0aeqmny" name="Set real name in profile" camunda:modelerTemplate="org.drupal.action.eca_set_field_value">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_set_field_value"/>
+        </camunda:properties>
+        <camunda:field name="method">
+          <camunda:string>set:clear</camunda:string>
+        </camunda:field>
+        <camunda:field name="strip_tags">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="trim">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="field_name">
+          <camunda:string>field_real_name</camunda:string>
+        </camunda:field>
+        <camunda:field name="save_entity">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+        <camunda:field name="field_value">
+          <camunda:string>[user:field_real_name:value]</camunda:string>
+        </camunda:field>
+        <camunda:field name="object">
+          <camunda:string>profile</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_04llbyd</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_04llbyd" name="different real names?" camunda:modelerTemplate="org.drupal.condition.eca_scalar" sourceRef="Activity_11sqti4" targetRef="Activity_0aeqmny">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_scalar"/>
+        </camunda:properties>
+        <camunda:field name="left">
+          <camunda:string>[profile:field_real_name]</camunda:string>
+        </camunda:field>
+        <camunda:field name="operator">
+          <camunda:string>equal</camunda:string>
+        </camunda:field>
+        <camunda:field name="right">
+          <camunda:string>[user:field_real_name]</camunda:string>
+        </camunda:field>
+        <camunda:field name="type">
+          <camunda:string>value</camunda:string>
+        </camunda:field>
+        <camunda:field name="case">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:startEvent id="Event_16zjyiz" name="Update profile" camunda:modelerTemplate="org.drupal.event.content_entity:update">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="content_entity:update"/>
+        </camunda:properties>
+        <camunda:field name="type">
+          <camunda:string>profile contact_detail</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_0ogrn85</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:task id="Activity_01emu1x" name="Load user entity" camunda:modelerTemplate="org.drupal.action.eca_token_set_value">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_token_set_value"/>
+        </camunda:properties>
+        <camunda:field name="token_name">
+          <camunda:string>profileuser</camunda:string>
+        </camunda:field>
+        <camunda:field name="token_value">
+          <camunda:string>[entity:uid]</camunda:string>
+        </camunda:field>
+        <camunda:field name="use_yaml">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0ogrn85</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_07rr54k</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_0ogrn85" sourceRef="Event_16zjyiz" targetRef="Activity_01emu1x"/>
+    <bpmn2:task id="Activity_1up7wfp" name="Set real name in user" camunda:modelerTemplate="org.drupal.action.eca_set_field_value">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_set_field_value"/>
+        </camunda:properties>
+        <camunda:field name="method">
+          <camunda:string>set:clear</camunda:string>
+        </camunda:field>
+        <camunda:field name="strip_tags">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="trim">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="field_name">
+          <camunda:string>field_real_name</camunda:string>
+        </camunda:field>
+        <camunda:field name="save_entity">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+        <camunda:field name="field_value">
+          <camunda:string>[entity:field_real_name]</camunda:string>
+        </camunda:field>
+        <camunda:field name="object">
+          <camunda:string>profileuser</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_07rr54k</bpmn2:incoming>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="Flow_07rr54k" name="different real names?" camunda:modelerTemplate="org.drupal.condition.eca_scalar" sourceRef="Activity_01emu1x" targetRef="Activity_1up7wfp">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="pluginid" value="eca_scalar"/>
+        </camunda:properties>
+        <camunda:field name="left">
+          <camunda:string>[profileuser:field_real_name]</camunda:string>
+        </camunda:field>
+        <camunda:field name="operator">
+          <camunda:string>equal</camunda:string>
+        </camunda:field>
+        <camunda:field name="right">
+          <camunda:string>[entity:field_real_name]</camunda:string>
+        </camunda:field>
+        <camunda:field name="type">
+          <camunda:string>value</camunda:string>
+        </camunda:field>
+        <camunda:field name="case">
+          <camunda:string>no</camunda:string>
+        </camunda:field>
+        <camunda:field name="negate">
+          <camunda:string>yes</camunda:string>
+        </camunda:field>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="sid-872a4894-448c-4201-8b98-d5e369db675f">
+    <bpmndi:BPMNPlane id="sid-187837e0-131b-45b5-862c-937a1d54ca3b" bpmnElement="eca_lib_0018">
+      <bpmndi:BPMNShape id="Event_16r9kcr_di" bpmnElement="Event_16r9kcr">
+        <dc:Bounds x="462" y="132" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="450" y="175" width="60" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_11sqti4_di" bpmnElement="Activity_11sqti4">
+        <dc:Bounds x="630" y="110" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0aeqmny_di" bpmnElement="Activity_0aeqmny">
+        <dc:Bounds x="870" y="110" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_16zjyiz_di" bpmnElement="Event_16zjyiz">
+        <dc:Bounds x="462" y="252" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="446" y="295" width="69" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_01emu1x_di" bpmnElement="Activity_01emu1x">
+        <dc:Bounds x="630" y="230" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1up7wfp_di" bpmnElement="Activity_1up7wfp">
+        <dc:Bounds x="870" y="230" width="100" height="80"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1czyt6b_di" bpmnElement="Flow_1czyt6b">
+        <di:waypoint x="498" y="150"/>
+        <di:waypoint x="630" y="150"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="531" y="132" width="69" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_04llbyd_di" bpmnElement="Flow_04llbyd">
+        <di:waypoint x="730" y="150"/>
+        <di:waypoint x="870" y="150"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="771" y="116" width="61" height="27"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ogrn85_di" bpmnElement="Flow_0ogrn85">
+        <di:waypoint x="498" y="270"/>
+        <di:waypoint x="630" y="270"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_07rr54k_di" bpmnElement="Flow_07rr54k">
+        <di:waypoint x="730" y="270"/>
+        <di:waypoint x="870" y="270"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="771" y="236" width="61" height="27"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

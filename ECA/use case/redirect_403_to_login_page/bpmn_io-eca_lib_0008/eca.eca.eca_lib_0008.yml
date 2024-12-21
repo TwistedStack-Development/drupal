@@ -1,0 +1,53 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - eca_base
+    - eca_misc
+    - eca_user
+id: eca_lib_0008
+modeller: bpmn_io
+label: 'Redirect 403 to Login Page'
+version: v1
+weight: 0
+events:
+  Event_1lm8bl4:
+    plugin: 'kernel:response'
+    label: 'Response created'
+    configuration: {  }
+    successors:
+      -
+        id: Activity_1tyou13
+        condition: Flow_01fv26h
+conditions:
+  Flow_01fv26h:
+    plugin: eca_scalar
+    configuration:
+      negate: false
+      case: false
+      left: '[event:code]'
+      right: '403'
+      operator: equal
+      type: value
+  Flow_1j9wjhz:
+    plugin: eca_current_user_role
+    configuration:
+      negate: false
+      role: anonymous
+gateways: {  }
+actions:
+  Activity_1tyou13:
+    plugin: eca_void_and_condition
+    label: AND
+    configuration: {  }
+    successors:
+      -
+        id: Activity_00dqmll
+        condition: Flow_1j9wjhz
+  Activity_00dqmll:
+    plugin: action_goto_action
+    label: Redirect
+    configuration:
+      url: '/user/login?destination=[event:path]'
+      replace_tokens: true
+    successors: {  }
