@@ -1,0 +1,7 @@
+name: Block In Page 403
+core_version_requirement: ^8 || ^9 || ^10 || ^11
+description: Provides the ability to place a block in page 403.
+package: Administration
+type: module
+dependencies:
+  - drupal:block

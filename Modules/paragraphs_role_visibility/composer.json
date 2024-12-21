@@ -1,0 +1,25 @@
+{
+  "name": "drupal/paragraphs_role_visibility",
+  "description": "Allow to make a single paragraph item visible for selected roles.",
+  "keywords": [
+    "Drupal",
+    "paragraphs"
+  ],
+  "type": "drupal-module",
+  "license": "GPL-2.0-or-later",
+  "homepage": "https://www.drupal.org/project/paragraphs_role_visibility",
+  "authors": [
+    {
+      "name": "Alexander Shabanov",
+      "homepage": "https://www.drupal.org/u/fromme",
+      "role": "Maintainer"
+    }
+  ],
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/paragraphs_role_visibility",
+    "source": "https://git.drupalcode.org/project/paragraphs_role_visibility"
+  },
+  "require": {
+    "drupal/paragraphs": "^1.6"
+  }
+}

@@ -1,0 +1,7 @@
+paragraphs_role_visibility:
+  version: VERSION
+  js:
+    js/paragraphs_role_visibility.js: {}
+  dependencies:
+    - core/drupal
+    - core/once

@@ -1,0 +1,7 @@
+# Schema for the configuration files of the block_in_page_not_found module.
+condition.plugin.page_not_found_request:
+  type: condition.plugin
+  mapping:
+    page_403:
+      type: boolean
+      label: 'Page 403'

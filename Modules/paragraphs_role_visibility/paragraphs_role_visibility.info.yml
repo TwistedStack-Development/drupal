@@ -1,0 +1,12 @@
+name: Paragraphs Role Visibility
+type: module
+description: 'Allow to make a single paragraph item visible for selected roles.'
+core_version_requirement: ^9 || ^10 || ^11
+package: Paragraphs
+dependencies:
+  - paragraphs:paragraphs
+
+# Information added by Drupal.org packaging script on 2024-06-25
+version: '2.0.3'
+project: 'paragraphs_role_visibility'
+datestamp: 1719312203

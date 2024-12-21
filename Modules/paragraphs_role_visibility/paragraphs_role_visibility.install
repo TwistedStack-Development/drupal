@@ -1,0 +1,72 @@
+<?php
+
+/**
+ * @file
+ * Installation hooks for Paragraphs Role Visibility module.
+ */
+
+/**
+ * Update the paragraphs_role_visibility data structure.
+ */
+function paragraphs_role_visibility_update_9201(&$sandbox) {
+  if (!isset($sandbox['progress'])) {
+    $count = \Drupal::entityQuery('paragraph')
+      ->accessCheck(FALSE)
+      ->count()
+      ->execute();
+
+    $sandbox['progress'] = 0;
+    $sandbox['updated'] = 0;
+    $sandbox['max'] = $count;
+  }
+
+  $paragraph_ids = \Drupal::entityQuery('paragraph')
+    ->accessCheck(FALSE)
+    ->range($sandbox['progress'], 25)
+    ->execute();
+
+  if (!empty($paragraph_ids)) {
+    /** @var \Drupal\Core\Entity\RevisionableStorageInterface $paragraphs_storage */
+    $paragraphs_storage = \Drupal::entityTypeManager()
+      ->getStorage('paragraph');
+    foreach ((array) $paragraph_ids as $paragraph_id) {
+      /** @var \Drupal\paragraphs\Entity\Paragraph $paragraph */
+      // Get all revisions of current paragraph.
+      $revision_ids = \Drupal::database()->query(
+        'SELECT [revision_id] FROM [paragraphs_item_revision] WHERE [id] = :id ORDER BY [id]',
+        [':id' => $paragraph_id]
+      )->fetchCol();
+
+      $updated = FALSE;
+      // Update behavior settings on each paragraph revision.
+      foreach ($revision_ids as $revision_id) {
+        $paragraph = $paragraphs_storage->loadRevision($revision_id);
+        $paragraphs_role_visibility = $paragraph->getBehaviorSetting('paragraphs_role_visibility', 'paragraphs_role_visibility');
+
+        if (!empty($paragraphs_role_visibility)) {
+          $paragraph->setBehaviorSettings('paragraphs_role_visibility', [
+            'wrapper' => [
+              'roles' => $paragraphs_role_visibility,
+              'operand' => 'or',
+            ],
+          ]);
+          $paragraph->save();
+          $updated = TRUE;
+        }
+      }
+
+      if ($updated) {
+        $sandbox['updated']++;
+      }
+      $sandbox['progress']++;
+    }
+  }
+
+  $sandbox['#finished'] = ($sandbox['progress'] >= $sandbox['max'])
+    ? TRUE : $sandbox['progress'] / $sandbox['max'];
+
+  return t('Processed @count paragraphs (@updated updated)', [
+    '@count' => $sandbox['progress'],
+    '@updated' => $sandbox['updated'],
+  ]);
+}
